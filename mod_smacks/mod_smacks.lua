@@ -85,11 +85,17 @@ local function outgoing_stanza_filter(stanza, session)
 		session.log("debug", "#queue = %d", #queue);
 		if session.hibernating then
 			session.log("debug", "hibernating, stanza queued");
-			return ""; -- Hack to make session.send() not return nil
+			return nil;
 		end
 		if #queue > max_unacked_stanzas and not session.awaiting_ack then
-			session.awaiting_ack = true;
-			return tostring(stanza)..tostring(st.stanza("r", { xmlns = session.smacks }));
+			session.log("debug", "Queuing <r> (in a moment)");
+			session.awaiting_ack_timer = module:add_timer(1e-06, function ()
+				if not session.awaiting_ack then
+					session.awaiting_ack = true;
+					session.log("debug", "Sending <r> (after send)");
+					(session.sends2s or session.send)(st.stanza("r", { xmlns = session.smacks }))
+				end
+			end);
 		end
 	end
 	return stanza;
@@ -165,7 +171,7 @@ module:hook_stanza(xmlns_sm3, "enable", function (session, stanza) return handle
 
 module:hook_stanza("http://etherx.jabber.org/streams", "features",
 		function (session, stanza)
-			module:add_timer(0, function ()
+			module:add_timer(1e-6, function ()
 				if can_do_smacks(session) then
 					if stanza:get_child("sm", xmlns_sm3) then
 						session.sends2s(st.stanza("enable", sm3_attr));
@@ -210,6 +216,9 @@ module:hook_stanza(xmlns_sm3, "r", function (origin, stanza) return handle_r(ori
 function handle_a(origin, stanza)
 	if not origin.smacks then return; end
 	origin.awaiting_ack = nil;
+	if origin.awaiting_ack_timer then
+		origin.awaiting_ack_timer:stop();
+	end
 	-- Remove handled stanzas from outgoing_stanza_queue
 	--log("debug", "ACK: h=%s, last=%s", stanza.attr.h or "", origin.last_acknowledged_stanza or "");
 	local h = tonumber(stanza.attr.h);
@@ -390,8 +399,12 @@ local function handle_read_timeout(event)
 	local session = event.session;
 	if session.smacks then
 		if session.awaiting_ack then
+			if session.awaiting_ack_timer then
+				session.awaiting_ack_timer:stop();
+			end
 			return false; -- Kick the session
 		end
+		session.log("debug", "Sending <r> (read timeout)");
 		(session.sends2s or session.send)(st.stanza("r", { xmlns = session.smacks }));
 		session.awaiting_ack = true;
 		return true;
