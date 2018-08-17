@@ -1,8 +1,15 @@
+-- mod_muc_search
+-- https://muclumbus.jabbercat.org/docs/api#xmpp
+-- TODO
+-- Result set management (pagination, limits)
+-- Sorting
+-- min_users
+
 local dataforms = require "util.dataforms";
 local st = require "util.stanza";
 
 local mod_muc = module:depends("muc");
-assert(mod_muc.live_rooms, "Missing required MUC API. Prosody >= hg:f5c43e829d93 required")
+assert(mod_muc.live_rooms, "Missing required MUC API. Prosody >= hg:f5c43e829d93 required");
 
 local search_form = dataforms.new {
 	{
@@ -79,8 +86,7 @@ module:hook("iq-set/host/https://xmlns.zombofant.net/muclumbus/search/1.0:search
 	local result = st.reply(stanza)
 		:tag("result", { xmlns = "https://xmlns.zombofant.net/muclumbus/search/1.0" });
 
-	for room in mod_muc.live_rooms() do
-
+	for room in mod_muc.live_rooms() do -- TODO s/live/all/ but preferably along with pagination/rsm
 		if room:get_public() and not room:get_members_only() then
 			module:log("debug", "Looking at room %s %q", room.jid, room._data);
 			if (query.sinname and room:get_name():find(query.q, 1, true))
