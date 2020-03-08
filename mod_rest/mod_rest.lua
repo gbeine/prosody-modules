@@ -83,14 +83,7 @@ local function parse(mimetype, data)
 	return nil, "unknown-payload-type";
 end
 
-local supported_types = {
-	"application/xmpp+xml",
-	"application/json",
-	"application/x-www-form-urlencoded",
-	"text/plain",
-};
-
-local function decide_type(accept)
+local function decide_type(accept, supported_types)
 	-- assumes the accept header is sorted
 	local ret = supported_types[1];
 	for i = 2, #supported_types do
@@ -101,6 +94,18 @@ local function decide_type(accept)
 	return ret;
 end
 
+local supported_inputs = {
+	"application/xmpp+xml",
+	"application/json",
+	"application/x-www-form-urlencoded",
+	"text/plain",
+};
+
+local supported_outputs = {
+	"application/xmpp+xml",
+	"application/json",
+};
+
 local function encode(type, s)
 	if type == "application/json" then
 		return json.encode(jsonmap.st2json(s));
@@ -109,6 +114,17 @@ local function encode(type, s)
 	end
 	return tostring(s);
 end
+
+local post_errors = {
+	parse = { code = 400, condition = "not-well-formed", text = "Failed to parse payload", },
+	xmlns = { code = 422, condition = "invalid-namespace", text = "'xmlns' attribute must be empty", },
+	name = { code = 422, condition = "unsupported-stanza-type", text = "Invalid stanza, must be 'message', 'presence' or 'iq'.", },
+	to = { code = 422, condition = "improper-addressing", text = "Invalid destination JID", },
+	from = { code = 422, condition = "invalid-from", text = "Invalid source JID", },
+	post_auth = { code = 403, condition = "not-authorized", text = "Not authorized to send stanza with requested 'from'", },
+	iq_type = { code = 422, condition = "invalid-xml", text = "'iq' stanza must be of type 'get' or 'set'", },
+	iq_tags = { code = 422, condition = "bad-format", text = "'iq' stanza must have exactly one child tag", },
+};
 
 local function handle_post(event)
 	local request, response = event.request, event.response;
@@ -128,26 +144,26 @@ local function handle_post(event)
 	local payload, err = parse(request.headers.content_type, request.body);
 	if not payload then
 		-- parse fail
-		return errors.new({ code = 400, text = "Failed to parse payload" }, { error = err, type = request.headers.content_type, data = request.body });
+		return errors.new("parse", { error = err, type = request.headers.content_type, data = request.body, }, post_errors);
 	end
 	if payload.attr.xmlns then
-		return errors.new({ code = 422, text = "'xmlns' attribute must be empty" });
+		return errors.new("xmlns", nil, post_errors);
 	elseif payload.name ~= "message" and payload.name ~= "presence" and payload.name ~= "iq" then
-		return errors.new({ code = 422, text = "Invalid stanza, must be 'message', 'presence' or 'iq'." });
+		return errors.new("name", nil, post_errors);
 	end
 	local to = jid.prep(payload.attr.to);
 	if not to then
-		return errors.new({ code = 422, text = "Invalid destination JID" });
+		return errors.new("to", nil, post_errors);
 	end
 	if payload.attr.from then
 		local requested_from = jid.prep(payload.attr.from);
 		if not requested_from then
-			return errors.new({ code = 422, text = "Invalid source JID" });
+			return errors.new("from", nil, post_errors);
 		end
 		if jid.compare(requested_from, from) then
 			from = requested_from;
 		else
-			return errors.new({ code = 403, text = "Not authorized to send from "..requested_from });
+			return errors.new("from_auth", nil, post_errors);
 		end
 	end
 	payload.attr = {
@@ -158,15 +174,15 @@ local function handle_post(event)
 		["xml:lang"] = payload.attr["xml:lang"],
 	};
 	module:log("debug", "Received[rest]: %s", payload:top_tag());
-	local send_type = decide_type((request.headers.accept or "") ..",".. request.headers.content_type)
+	local send_type = decide_type((request.headers.accept or "") ..",".. request.headers.content_type, supported_outputs)
 	if payload.name == "iq" then
 		function origin.send(stanza)
 			module:send(stanza);
 		end
 		if payload.attr.type ~= "get" and payload.attr.type ~= "set" then
-			return errors.new({ code = 422, text = "'iq' stanza must be of type 'get' or 'set'" });
+			return errors.new("iq_type", nil, post_errors);
 		elseif #payload.tags ~= 1 then
-			return errors.new({ code = 422, text = "'iq' stanza must have exactly one child tag" });
+			return errors.new("iq_tags", nil, post_errors);
 		end
 		return module:send_iq(payload, origin):next(
 			function (result)
@@ -224,7 +240,7 @@ if rest_url then
 				module:set_status("info", "Connected");
 			end
 			if code == 200 and response.headers.accept then
-				send_type = decide_type(response.headers.accept);
+				send_type = decide_type(response.headers.accept, supported_outputs);
 				module:log("debug", "Set 'rest_callback_content_type' = %q based on Accept header", send_type);
 			end
 		end);
@@ -280,7 +296,7 @@ if rest_url then
 				headers = {
 					["Content-Type"] = send_type,
 					["Content-Language"] = stanza.attr["xml:lang"],
-					Accept = table.concat(supported_types, ", ");
+					Accept = table.concat(supported_inputs, ", ");
 				},
 			}, function (body, code, response)
 				if code == 0 then
@@ -376,10 +392,29 @@ if rest_url then
 	end
 end
 
+local supported_errors = {
+	"text/html",
+	"application/xmpp+xml",
+	"application/json",
+};
+
 local http_server = require "net.http.server";
 module:hook_object_event(http_server, "http-error", function (event)
 	local request, response = event.request, event.response;
-	if decide_type(request and request.headers.accept or "") == "application/json" then
+	local response_as = decide_type(request and request.headers.accept or "", supported_errors);
+	if response_as == "application/xmpp+xml" then
+		if response then
+			response.headers.content_type = "application/xmpp+xml";
+		end
+		local stream_error = st.stanza("error", { xmlns = "http://etherx.jabber.org/streams" });
+		if event.error then
+			stream_error:tag(event.error.condition, {xmlns = 'urn:ietf:params:xml:ns:xmpp-streams' }):up();
+			if event.error.text then
+				stream_error:text_tag("text", event.error.text, {xmlns = 'urn:ietf:params:xml:ns:xmpp-streams' });
+			end
+		end
+		return tostring(stream_error);
+	elseif response_as == "application/json" then
 		if response then
 			response.headers.content_type = "application/json";
 		end
@@ -389,4 +424,4 @@ module:hook_object_event(http_server, "http-error", function (event)
 				code = event.code,
 			});
 	end
-end, 10);
+end, 1);
