@@ -415,7 +415,7 @@ module:log("info", "Storage path: '%s'", storage_path);
 function module.command(args)
 	datamanager = require "core.storagemanager".olddm;
 	-- luacheck: ignore 421/user
-	if args[1] == "expire" then
+	if args[1] == "expire" and args[2] then
 		local split = require "util.jid".prepped_split;
 		for i = 2, #args do
 			local user, host = split(args[i]);
@@ -427,6 +427,10 @@ function module.command(args)
 				end
 			end
 		end
+	else
+		print("prosodyctl mod_http_upload expire [host or user@host]+")
+		print("\tProcess upload expiry for the given list of hosts and/or users");
+		return 1;
 	end
 end
 

@@ -17,7 +17,7 @@ local cache = dep.softreq("util.cache");	-- only available in prosody 0.10+
 local uuid_generate = require "util.uuid".generate;
 local jid = require "util.jid";
 
-local t_insert, t_remove = table.insert, table.remove;
+local t_remove = table.remove;
 local math_min = math.min;
 local math_max = math.max;
 local os_time = os.time;
@@ -200,8 +200,15 @@ local function request_ack_if_needed(session, force, reason)
 end
 
 local function outgoing_stanza_filter(stanza, session)
-	local is_stanza = stanza.attr and not stanza.attr.xmlns and not stanza.name:find":";
-	if is_stanza and not stanza._cached then -- Stanza in default stream namespace
+	-- XXX: Normally you wouldn't have to check the xmlns for a stanza as it's
+	-- supposed to be nil.
+	-- However, when using mod_smacks with mod_websocket, then mod_websocket's
+	-- stanzas/out filter can get called before this one and adds the xmlns.
+	local is_stanza = stanza.attr and
+		(not stanza.attr.xmlns or stanza.attr.xmlns == 'jabber:client')
+		and not stanza.name:find":";
+
+	if is_stanza and not stanza._cached then
 		local queue = session.outgoing_stanza_queue;
 		local cached_stanza = st.clone(stanza);
 		cached_stanza._cached = true;
