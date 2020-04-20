@@ -426,8 +426,7 @@ local function get_stanza_id(stanza, by_jid)
 			return tag.attr.id;
 		end
 	end
-	return null;
-
+	return nil;
 end
 module:hook("delivery/failure", function(event)
 	local session, stanza = event.session, event.stanza;
