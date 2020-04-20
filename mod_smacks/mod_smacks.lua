@@ -420,6 +420,15 @@ local function handle_unacked_stanzas(session)
 end
 
 -- don't send delivery errors for messages which will be delivered by mam later on
+local function has_stanza_id(stanza, by_jid)
+	for tag in stanza:childtags("stanza-id", "urn:xmpp:sid:0") do
+		if tag.attr.by == by_jid and tag.attr.id then
+			return true
+		end
+	end
+	return false;
+
+end
 module:hook("delivery/failure", function(event)
 	local session, stanza = event.session, event.stanza;
 	-- Only deal with authenticated (c2s) sessions
@@ -428,15 +437,17 @@ module:hook("delivery/failure", function(event)
 				( stanza.attr.type == "chat" or ( stanza.attr.type or "normal" ) == "normal" ) then
 			-- do nothing here for normal messages and don't send out "message delivery errors",
 			-- because messages are already in MAM at this point (no need to frighten users)
-			if session.mam_requested and stanza._was_archived then
+			if session.mam_requested and has_stanza_id(stanza, jid.bare(session.full_jid) then
+				session.log("debug", "mod_smacks delivery/failuere returning true for mam-handled stanza");
 				return true;		-- stanza handled, don't send an error
 			end
 			-- store message in offline store, if this client does not use mam *and* was the last client online
 			local sessions = prosody.hosts[module.host].sessions[session.username] and
 					prosody.hosts[module.host].sessions[session.username].sessions or nil;
 			if sessions and next(sessions) == session.resource and next(sessions, session.resource) == nil then
-				module:fire_event("message/offline/handle", { origin = session, stanza = stanza } );
-				return true;		-- stanza handled, don't send an error
+				local ok = module:fire_event("message/offline/handle", { origin = session, stanza = stanza } );
+				session.log("debug", "mod_smacks delivery/failuere returning %s for offline-handled stanza", tostring(ok));
+				return ok;		-- if stanza was handled, don't send an error
 			end
 		end
 	end
