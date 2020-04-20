@@ -420,13 +420,13 @@ local function handle_unacked_stanzas(session)
 end
 
 -- don't send delivery errors for messages which will be delivered by mam later on
-local function has_stanza_id(stanza, by_jid)
+local function get_stanza_id(stanza, by_jid)
 	for tag in stanza:childtags("stanza-id", "urn:xmpp:sid:0") do
-		if tag.attr.by == by_jid and tag.attr.id then
-			return true
+		if tag.attr.by == by_jid then
+			return tag.attr.id;
 		end
 	end
-	return false;
+	return null;
 
 end
 module:hook("delivery/failure", function(event)
@@ -437,8 +437,9 @@ module:hook("delivery/failure", function(event)
 				( stanza.attr.type == "chat" or ( stanza.attr.type or "normal" ) == "normal" ) then
 			-- do nothing here for normal messages and don't send out "message delivery errors",
 			-- because messages are already in MAM at this point (no need to frighten users)
-			if session.mam_requested and has_stanza_id(stanza, jid.bare(session.full_jid) then
-				session.log("debug", "mod_smacks delivery/failuere returning true for mam-handled stanza");
+			local stanza_id = get_stanza_id(stanza, jid.bare(session.full_jid));
+			if session.mam_requested and stanza_id ~= nil then
+				session.log("debug", "mod_smacks delivery/failuere returning true for mam-handled stanza: mam-archive-id=%s", tostring(stanza_id));
 				return true;		-- stanza handled, don't send an error
 			end
 			-- store message in offline store, if this client does not use mam *and* was the last client online
