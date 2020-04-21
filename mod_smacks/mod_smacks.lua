@@ -420,6 +420,8 @@ local function handle_unacked_stanzas(session)
 end
 
 -- don't send delivery errors for messages which will be delivered by mam later on
+-- check if stanza was archived --> this will allow us to send back errors for stanzas not archived
+-- because the user configured the server to do so ("no-archive"-setting for one special contact for example)
 local function get_stanza_id(stanza, by_jid)
 	for tag in stanza:childtags("stanza-id", "urn:xmpp:sid:0") do
 		if tag.attr.by == by_jid then
@@ -451,15 +453,6 @@ module:hook("delivery/failure", function(event)
 			end
 		end
 	end
-end);
-
--- mark stanzas as archived --> this will allow us to send back errors for stanzas not archived
--- because the user configured the server to do so ("no-archive"-setting for one special contact for example)
-module:hook("archive-message-added", function(event)
-	local session, stanza, for_user, stanza_id  = event.origin, event.stanza, event.for_user, event.id;
-	local log = session.log or module._log
-	log("debug", "Marking stanza as archived, archive_id: %s, stanza: %s", tostring(stanza_id), tostring(stanza:top_tag()));
-	stanza._was_archived = true;
 end);
 
 module:hook("pre-resource-unbind", function (event)
