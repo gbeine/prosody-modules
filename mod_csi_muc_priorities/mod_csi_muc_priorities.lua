@@ -96,9 +96,9 @@ local adhoc_command_handler = adhoc_inital_data(priority_settings_form, function
 		table.sort(unimportant);
 	end
 	return {
-	important = important;
-	unimportant = unimportant;
-};
+		important = important;
+		unimportant = unimportant;
+	};
 end, function(fields, form_err, data)
 	if form_err then
 		return { status = "completed", error = { message = "Problem in submitted form" } };
