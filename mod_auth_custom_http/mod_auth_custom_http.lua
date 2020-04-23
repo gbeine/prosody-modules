@@ -7,7 +7,9 @@
 
 local new_sasl = require "util.sasl".new;
 local json = require "util.json";
+prosody.unlock_globals();
 local http = require "socket.http";
+prosody.lock_globals();
 
 local options = module:get_option("auth_custom_http");
 local post_url = options and options.post_url;
