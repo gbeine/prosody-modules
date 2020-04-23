@@ -105,11 +105,15 @@ end, function(fields, form_err, data)
 	end
 	local prioritized_jids = {};
 	if fields.unimportant then
-		for _, jid in ipairs(fields.unimportant) do
-			prioritized_jids[jid] = false;
+		if fields.unimportant then
+			for _, jid in ipairs(fields.unimportant) do
+				prioritized_jids[jid] = false;
+			end
 		end
-		for _, jid in ipairs(fields.important) do
-			prioritized_jids[jid] = true;
+		if fields.important then
+			for _, jid in ipairs(fields.important) do
+				prioritized_jids[jid] = true;
+			end
 		end
 	end
 
