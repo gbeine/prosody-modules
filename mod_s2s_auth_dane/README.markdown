@@ -82,7 +82,7 @@ Compatibility
 
 Works with Prosody 0.9 until 0.11.
 
-**Broken** since (trunk revision 756b8821007a)[https://hg.prosody.im/trunk/rev/756b8821007a].
+**Broken** since [trunk revision 756b8821007a](https://hg.prosody.im/trunk/rev/756b8821007a).
 
 Known issues
 ============
