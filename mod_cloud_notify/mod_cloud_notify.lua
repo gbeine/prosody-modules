@@ -173,6 +173,11 @@ local function push_enable(event)
 		origin.send(st.error_reply(stanza, "modify", "bad-request", "Missing jid"));
 		return true;
 	end
+	if push_jid == stanza.attr.from then
+		origin.log("debug", "Push notification enable request 'jid' field identical to our own");
+		origin.send(st.error_reply(stanza, "modify", "bad-request", "JID must be different from ours"));
+		return true;
+	end
 	local publish_options = enable:get_child("x", "jabber:x:data");
 	if not publish_options then
 		-- Could be intentional
