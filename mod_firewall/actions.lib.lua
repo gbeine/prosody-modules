@@ -208,7 +208,6 @@ function action_handlers.JUMP_CHAIN(name)
 			log("debug", "Chain %q rejected stanza (ret %s)", $chain_name$, tostring(ret));
 			return ret;
 		end
-		log("debug", "Chain %q did not accept or reject stanza (ret %s)", $chain_name$, tostring(ret));
 	end]], { chain_event = "firewall/chains/"..name, chain_name = name });
 end
 
