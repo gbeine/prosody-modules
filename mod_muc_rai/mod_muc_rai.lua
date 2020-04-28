@@ -137,9 +137,17 @@ local function get_interested_rooms(user_jid)
 	return muc_affiliation_store:get_all(jid.bare(user_jid));
 end
 
+local function is_subscribed(user_jid)
+	return not not subscribed_users:get(user_jid);
+end
+
 -- Subscribes to all rooms that the user has an interest in
 -- Returns a set of room JIDs that have already had activity (thus no subscription)
 local function subscribe_all_rooms(user_jid)
+	if is_subscribed(user_jid) then
+		return nil;
+	end
+
 	-- Send activity notifications for all relevant rooms
 	local interested_rooms, err = get_interested_rooms(user_jid);
 
