@@ -193,7 +193,7 @@ module:hook("presence/host", function (event)
 		end
 	end
 
-	local reply = st.reply(stanza)
+	local reply = st.message({ to = stanza.attr.from, from = module.host })
 		:tag("rai", { xmlns = xmlns_rai });
 	for room_jid in pairs(rooms_with_activity) do
 		reply:text_tag("activity", room_jid);
