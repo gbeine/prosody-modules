@@ -16,4 +16,8 @@ credentials](https://tools.ietf.org/html/draft-uberti-behave-turn-rest-00).
 
 -   [coturn](https://github.com/coturn/coturn) - [setup guide][doc:coturn]
 -   [restund](http://www.creytiv.com/restund.html)
+
+<!--
+TODO Check if this one actually suppors the rest credentials api
 -   [reTURNManager](https://github.com/thisisdingo/reTURNManager)
+-->
