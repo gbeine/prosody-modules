@@ -1,10 +1,9 @@
-Introduction
-============
+# Introduction
 
-[XEP-0215] implementation for [time-limited TURN credentials](https://tools.ietf.org/html/draft-uberti-behave-turn-rest-00).
+[XEP-0215] implementation for [time-limited TURN
+credentials](https://tools.ietf.org/html/draft-uberti-behave-turn-rest-00).
 
-Configuration
-=============
+# Configuration
 
   Option                    Type     Default
   ------------------------- -------- ------------
