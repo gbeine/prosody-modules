@@ -12,4 +12,8 @@ credentials](https://tools.ietf.org/html/draft-uberti-behave-turn-rest-00).
   turncredentials\_port     number   `3478`
   turncredentials\_ttl      number   `86400`
 
+# Compatible TURN / STUN servers.
 
+-   [coturn](https://github.com/coturn/coturn) - [setup guide][doc:coturn]
+-   [restund](http://www.creytiv.com/restund.html)
+-   [reTURNManager](https://github.com/thisisdingo/reTURNManager)
