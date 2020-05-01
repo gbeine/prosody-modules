@@ -407,12 +407,14 @@ local function handle_unacked_stanzas(session)
 		session.outgoing_stanza_queue = {};
 		for i=1,#queue do
 			if not module:fire_event("delivery/failure", { session = session, stanza = queue[i] }) then
-				local reply = st.reply(queue[i]);
-				if reply.attr.to ~= session.full_jid then
-					reply.attr.type = "error";
-					reply:tag("error", error_attr)
-						:tag("recipient-unavailable", {xmlns = "urn:ietf:params:xml:ns:xmpp-stanzas"});
-					core_process_stanza(session, reply);
+				if queue[i].attr.type ~= "error" then
+					local reply = st.reply(queue[i]);
+					if reply.attr.to ~= session.full_jid then
+						reply.attr.type = "error";
+						reply:tag("error", error_attr)
+							:tag("recipient-unavailable", {xmlns = "urn:ietf:params:xml:ns:xmpp-stanzas"});
+						core_process_stanza(session, reply);
+					end
 				end
 			end
 		end
