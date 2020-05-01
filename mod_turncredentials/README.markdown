@@ -1,10 +1,9 @@
-Introduction
-============
+# Introduction
 
-[XEP-0215] implementation for time-limited TURN credentials.
+[XEP-0215] implementation for [time-limited TURN
+credentials](https://tools.ietf.org/html/draft-uberti-behave-turn-rest-00).
 
-Configuration
-=============
+# Configuration
 
   Option                    Type     Default
   ------------------------- -------- ------------
@@ -13,4 +12,7 @@ Configuration
   turncredentials\_port     number   `3478`
   turncredentials\_ttl      number   `86400`
 
+# Compatible TURN / STUN servers.
 
+-   [coturn](https://github.com/coturn/coturn) - [setup guide][doc:coturn]
+-   [restund](http://www.creytiv.com/restund.html)
