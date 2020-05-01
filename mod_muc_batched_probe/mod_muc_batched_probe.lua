@@ -23,7 +23,7 @@ local function respondToBatchedProbe(event)
 	end;
 
 	local room = get_room_from_jid(stanza.attr.to);
-	for item in query.get_children() do
+	for item in query:children() do
 		local probed_jid = item.attr.jid;
 		room:respond_to_probe(stanza.attr.from, probed_jid);
 	end
