@@ -8,6 +8,8 @@
 -- Notably Conversations will ack the origin-id instead. We need to update the XEP to
 -- clarify the correct behaviour.
 
+local st = require "util.stanza";
+
 local xmlns_markers = "urn:xmpp:chat-markers:0";
 
 local marker_element_name = module:get_option_string("muc_marker_type", "displayed");
@@ -54,6 +56,35 @@ module:hook("muc-message-is-historic", function (event)
 		return false
 	end
 end);
+
+local function find_nickname(room, user_jid)
+	-- Find their current nickname
+	for nick, occupant in pairs(room._occupants) do
+		if occupant.bare_jid == user_jid then
+			return nick;
+		end
+	end
+	-- Or if they're not here
+	local nickname = room:get_affiliation_data(user_jid, "reserved_nickname");
+	if nickname then return room.jid.."/"..nickname; end
+end
+
+-- Synthesize markers
+if muc_marker_map_store.get_all then
+module:hook("muc-occupant-session-new", function (event)
+	local room, to = event.room, event.stanza.attr.from;
+	local markers = muc_marker_map_store:get_all(room.jid);
+	if not markers then return end
+	for user_jid, id in pairs(markers) do
+		local room_nick = find_nickname(room, user_jid);
+		if room_nick then
+			local recv_marker = st.message({ type = "groupchat", from = room_nick, to = to })
+				:tag("received", { xmlns = xmlns_markers, id = id });
+			room:route_stanza(recv_marker);
+		end
+	end
+end);
+end
 
 -- Public API
 
