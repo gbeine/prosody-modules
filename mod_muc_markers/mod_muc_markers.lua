@@ -44,8 +44,15 @@ module:hook("muc-occupant-groupchat", function (event)
 	module:log("warn", "New marker for %s: %s", event.occupant.bare_jid, marker.attr.id);
 	muc_marker_map_store:set(event.occupant.bare_jid, event.room.jid, marker.attr.id);
 
-	-- Prevent stanza from reaching the room (it's just noise)
-	return true;
+end);
+
+module:hook("muc-message-is-historic", function (event)
+	local marker = event.stanza:get_child("received", xmlns_markers);
+
+	-- Prevent stanza from reaching the archive (it's just noise)
+	if marker then
+		return false
+	end
 end);
 
 -- Public API
