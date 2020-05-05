@@ -17,16 +17,12 @@ local function generate_id(occupant, room)
 		room._data.occupant_id_salt = uuid.generate();
 	end
 
-	if room._data.occupant_ids == nil then
-		room._data.occupant_ids = {};
-	end
+	-- XXX: Temporary not-so-important migration measure. Remove this next time
+	-- somebody looks at it. This module used to store every participant's
+	-- occupant-id all the time forever.
+	room._data.occupant_ids = nil;
 
-	if room._data.occupant_ids[bare] == nil then
-		local unique_id = b64encode(hmac_sha256(bare, room._data.occupant_id_salt));
-		room._data.occupant_ids[bare] = unique_id;
-	end
-
-	return room._data.occupant_ids[bare];
+	return b64encode(hmac_sha256(bare, room._data.occupant_id_salt));
 end
 
 local function update_occupant(event)
