@@ -1,10 +1,17 @@
 local adns = require "net.adns";
 local rbl = module:get_option_string("registration_rbl");
+local rbl_message = module:get_option_string("registration_rbl_message");
+local st = require "util.stanza";
+
+
+local function cleanup_ip(ip)
+	if ip:sub(1,7):lower() == "::ffff:" then
+		return ip:sub(8);
+	end
+	return ip;
+end
 
 local function reverse(ip, suffix)
-	if ip:sub(1,7):lower() == "::ffff:" then
-		ip = ip:sub(8);
-	end
 	local a,b,c,d = ip:match("^(%d+).(%d+).(%d+).(%d+)$");
 	if not a then return end
 	return ("%d.%d.%d.%d.%s"):format(d,c,b,a, suffix);
@@ -12,7 +19,7 @@ end
 
 module:hook("user-registered", function (event)
 	local session = event.session;
-	local ip = session and session.ip;
+	local ip = session and session.ip and cleanup_ip(session.ip);
 	local rbl_ip = ip and reverse(ip, rbl);
 	if rbl_ip then
 		local registration_time = os.time();
@@ -25,6 +32,14 @@ module:hook("user-registered", function (event)
 					user.firewall_marks.dnsbl_hit = registration_time;
 				else
 					module:open_store("firewall_marks", "map"):set(event.username, "dnsbl_hit", registration_time);
+				end
+				if rbl_message then
+					module:log("debug", "Warning RBL registered user %s@%s", event.username, event.host);
+					event.ip = ip;
+					local rbl_stanza =
+						st.message({ to = event.username.."@"..event.host, from = event.host },
+							rbl_message:gsub("$(%w+)", event));
+					module:send(rbl_stanza);
 				end
 			end
 		end, rbl_ip);
