@@ -15,6 +15,7 @@ module:hook("csi-is-stanza-important", function (event)
 			if priorities then
 				local priority = priorities[room_jid];
 				if priority ~= nil then
+					event.reason = "muc priority";
 					return priority;
 				end
 			end
@@ -27,10 +28,12 @@ module:hook("csi-is-stanza-important", function (event)
 				local room_nick = rooms[room_jid];
 				if room_nick then
 					if body:find(room_nick, 1, true) then
+						event.reason = "muc mention";
 						return true;
 					end
 					-- Your own messages
 					if stanza.attr.from == (room_jid .. "/" .. room_nick) then
+					event.reason = "muc own message";
 						return true;
 					end
 				end
