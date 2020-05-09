@@ -24,6 +24,7 @@ module:hook("csi-is-stanza-important", function (event)
 		end
 		if (os.time() - user_session.grace_time_start) < grace_period then
 			session.log("debug", "Within grace period, probably seen");
+			event.reason = "grace period";
 			return false;
 		end
 	end
