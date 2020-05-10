@@ -49,6 +49,9 @@ return function (arg)
 	end
 
 	local session = { notopen = true };
+	function session.send(stanza)
+		stderr("Reply:", "\n"..tostring(stanza).."\n");
+	end
 	local stream = xmppstream.new(session, stream_callbacks);
 	stream:feed("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client'>");
 	local line_count = 0;
