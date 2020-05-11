@@ -10,6 +10,7 @@ local set = require"util.set";
 local new_throttle = require "util.throttle".create;
 local hashes = require "util.hashes";
 local jid = require "util.jid";
+local lfs = require "lfs";
 
 local multirate_cache_size = module:get_option_number("firewall_multirate_cache_limit", 1000);
 
@@ -150,6 +151,10 @@ local list_backends = {
 			local items = {};
 			local n = 0;
 			local filename = file_spec:gsub("^file:", "");
+			if opts.missing == "ignore" and not lfs.attributes(filename, "mode") then
+				module:log("debug", "Ignoring missing list file: %s", filename);
+				return;
+			end
 			local file, err = io.open(filename);
 			if not file then
 				module:log("warn", "Failed to open list from %s: %s", filename, err);
