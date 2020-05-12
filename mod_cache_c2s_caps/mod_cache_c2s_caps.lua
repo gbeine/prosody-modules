@@ -89,7 +89,7 @@ local function presence_stanza_handler(event)
 		return;
 	end
 
-	origin.log("debug", "Received presence with SHA-1 caps %s, querying disco#info", node_query);
+	origin.log("debug", "Received presence from %s with SHA-1 caps %s, querying disco#info", from, node_query);
 
 	local id = uuid_gen();
 	iq_node_map[from..id] = node_query
