@@ -148,8 +148,8 @@ local list_backends = {
 	-- %LIST: file:/path/to/file
 	file = {
 		init = function (self, file_spec, opts)
-			local items = {};
-			local n = 0;
+			local n, items = 0, {};
+			self.items = items;
 			local filename = file_spec:gsub("^file:", "");
 			if opts.missing == "ignore" and not lfs.attributes(filename, "mode") then
 				module:log("debug", "Ignoring missing list file: %s", filename);
@@ -167,7 +167,6 @@ local list_backends = {
 					end
 				end
 			end
-			self.items = items;
 			module:log("debug", "Loaded %d items from %s", n, filename);
 		end;
 		add = function (self, item)
