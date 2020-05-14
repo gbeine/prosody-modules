@@ -54,3 +54,9 @@ external_services = {
     };
 }
 ```
+
+Compatibility
+=============
+
+Incompatible with
+[mod_turncredentials](https://modules.prosody.im/mod_turncredentials).

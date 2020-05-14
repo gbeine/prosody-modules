@@ -16,3 +16,7 @@ credentials](https://tools.ietf.org/html/draft-uberti-behave-turn-rest-00).
 
 -   [coturn](https://github.com/coturn/coturn) - [setup guide][doc:coturn]
 -   [restund](http://www.creytiv.com/restund.html)
+
+# Compatibility
+
+Incompatible with [mod_extdisco](https://modules.prosody.im/mod_extdisco.html)
