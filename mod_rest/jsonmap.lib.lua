@@ -425,6 +425,10 @@ local implied_kinds = {
 	status = "presence",
 }
 
+local implied_types = {
+	command = "set",
+}
+
 local kind_by_type = {
 	get = "iq", set = "iq", result = "iq",
 	normal = "message", chat = "message", headline = "message", groupchat = "message",
@@ -507,7 +511,15 @@ local function json2st(t)
 	if type(t) ~= "table" or not str(next(t)) then
 		return nil, "invalid-json";
 	end
-	local kind = str(t.kind) or kind_by_type[str(t.type)];
+	local t_type = str(t.type);
+	if t_type == nil then
+		for k, implied in pairs(implied_types) do
+			if t[k] then
+				t_type = implied;
+			end
+		end
+	end
+	local kind = str(t.kind) or kind_by_type[t_type];
 	if not kind then
 		for k, implied in pairs(implied_kinds) do
 			if t[k] then
@@ -517,8 +529,12 @@ local function json2st(t)
 		end
 	end
 
+	if t_type == "available" then
+		t_type = nil;
+	end
+
 	local s = st.stanza(kind or "message", {
-		type = t.type ~= "available" and str(t.type) or nil,
+		type = t_type;
 		to = str(t.to) and jid.prep(t.to);
 		from = str(t.to) and jid.prep(t.from);
 		id = str(t.id),
