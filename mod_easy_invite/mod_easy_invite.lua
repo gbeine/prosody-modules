@@ -137,7 +137,7 @@ end);
 
 -- Registration attempt - ensure a valid preauth token has been supplied
 module:hook("user-registering", function (event)
-	local validated_invite = event.session.validated_invite;
+	local validated_invite = event.validated_invite or (event.session and event.session.validated_invite);
 	if invite_only and not validated_invite then
 		event.allowed = false;
 		event.reason = "Registration on this server is through invitation only";
@@ -169,7 +169,7 @@ end
 
 -- Registration successful, if there was a preauth token, mark it as used
 module:hook("user-registered", function (event)
-	local validated_invite = event.session.validated_invite;
+	local validated_invite = event.validated_invite or (event.session and event.session.validated_invite);
 	if not validated_invite then
 		return;
 	end
