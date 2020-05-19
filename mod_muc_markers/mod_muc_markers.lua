@@ -10,6 +10,8 @@
 
 local xmlns_markers = "urn:xmpp:chat-markers:0";
 
+local marker_element_name = module:get_option_string("muc_marker_type", "displayed");
+
 local muc_marker_map_store = module:open_store("muc_markers", "map");
 
 local function get_stanza_id(stanza, by_jid)
@@ -35,7 +37,7 @@ module:hook("muc-broadcast-message", function (event)
 end, -1);
 
 module:hook("muc-occupant-groupchat", function (event)
-	local marker = event.stanza:get_child("received", xmlns_markers);
+	local marker = event.stanza:get_child(marker_element_name, xmlns_markers);
 	if not marker then return; end
 
 	-- Store the id that the user has received to

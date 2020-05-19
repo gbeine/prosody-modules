@@ -1,6 +1,6 @@
 # Introduction
 
-This module adds an internal Prosody API to retrieve the last received message by MUC occupants.
+This module adds an internal Prosody API to retrieve the last displayed message by MUC occupants.
 
 ## Requirements
 
@@ -26,7 +26,9 @@ modules_enabled = {
 
 ## Settings
 
-There are no configuration options for this module.
+| Name            | Description                                                  | Default    |
+|-----------------|--------------------------------------------------------------|------------|
+| muc_marker_type | The type of marker to track (displayed/received/acknowledged)| "displayed"|
 
 # Developers
 
@@ -36,6 +38,6 @@ There are no configuration options for this module.
 local muc_markers = module:depends("muc_markers");
 
 function something()
-	local last_received_id = muc_markers.get_user_read_marker("user@localhost", "room@conference.localhost");
+	local last_displayed_id = muc_markers.get_user_read_marker("user@localhost", "room@conference.localhost");
 end
 ```
