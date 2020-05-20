@@ -11,6 +11,9 @@ local get_room_from_jid = rawget(mod_muc, "get_room_from_jid") or
 
 module:hook("message/full", function(event)
 	local stanza, origin = event.stanza, event.origin;
+	if stanza.attr.type == "error" then
+		return
+	end
 	local to, from = stanza.attr.to, stanza.attr.from;
 	local room = get_room_from_jid(bare_jid(to));
 	local to_occupant = room and room._occupants[to];
