@@ -90,11 +90,9 @@ module:add_item("adhoc",
 
 				local group, err = groups:get(fields.group);
 				if group then
-					if err then
-						return false, "An error occurred on the server. Please try again later.";
-					else
-						return false, "That group already exists";
-					end
+					return false, "That group already exists";
+				elseif err then
+					return false, "An error occurred on the server. Please try again later.";
 				end
 
 				if not groups:set(fields.group, { [user] = true }) then
