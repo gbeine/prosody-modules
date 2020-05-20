@@ -131,7 +131,7 @@ module:add_item("adhoc",
 						return false, "No such group";
 					end
 				end
-				if group[data.from] then
+				if group[user] then
 					return false, "You are already in this group.";
 				end
 
