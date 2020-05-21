@@ -13,6 +13,7 @@ local st = require "util.stanza";
 local xmlns_markers = "urn:xmpp:chat-markers:0";
 
 local marker_element_name = module:get_option_string("muc_marker_type", "displayed");
+local marker_element_names = module:get_option_set("muc_marker_types", { marker_element_name });
 
 local muc_marker_map_store = module:open_store("muc_markers", "map");
 
@@ -39,8 +40,10 @@ module:hook("muc-broadcast-message", function (event)
 end, -1);
 
 module:hook("muc-occupant-groupchat", function (event)
-	local marker = event.stanza:get_child(marker_element_name, xmlns_markers);
-	if not marker then return; end
+	local marker = event.stanza:child_with_ns(xmlns_markers);
+	if not marker or not marker_element_names:contains(marker.name) then
+		return; -- No marker, or not one we are interested in
+	end
 
 	-- Store the id that the user has received to
 	module:log("warn", "New marker for %s: %s", event.occupant.bare_jid, marker.attr.id);
