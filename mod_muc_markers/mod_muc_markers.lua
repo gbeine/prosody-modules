@@ -87,6 +87,7 @@ end);
 end
 
 -- Public API
+--luacheck: ignore 131
 
 function get_user_read_marker(user_jid, room_jid)
 	return muc_marker_map_store:get(user_jid, room_jid);
