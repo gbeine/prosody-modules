@@ -382,6 +382,7 @@ local function logs_page(event, path)
 	end
 
 	local links = {
+		{ href = "../", rel = "up", text = "Room list" },
 		{ href = "./", rel = "up", text = "Calendar" },
 	};
 	if prev_when ~= "" then
