@@ -14,6 +14,7 @@ local json = require "util.json";
 local st = require "util.stanza";
 local um = require "core.usermanager";
 local xml = require "util.xml";
+local have_cbor, cbor = pcall(require, "cbor");
 
 local jsonmap = module:require"jsonmap";
 
@@ -68,6 +69,12 @@ local function parse(mimetype, data)
 			return parsed, err;
 		end
 		return jsonmap.json2st(parsed);
+	elseif mimetype == "application/cbor" and have_cbor then
+		local parsed, err = cbor.decode(data);
+		if not parsed then
+			return parsed, err;
+		end
+		return jsonmap.json2st(parsed);
 	elseif mimetype == "application/x-www-form-urlencoded"then
 		local parsed = http.formdecode(data);
 		if type(parsed) == "string" then
@@ -106,9 +113,16 @@ local supported_outputs = {
 	"application/json",
 };
 
+if have_cbor then
+	table.insert(supported_inputs, "application/cbor");
+	table.insert(supported_outputs, "application/cbor");
+end
+
 local function encode(type, s)
 	if type == "application/json" then
 		return json.encode(jsonmap.st2json(s));
+	elseif type == "application/cbor" then
+		return cbor.encode(jsonmap.st2json(s));
 	elseif type == "text/plain" then
 		return s:get_child_text("body") or "";
 	end
