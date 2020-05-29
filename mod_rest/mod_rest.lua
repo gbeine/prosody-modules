@@ -126,6 +126,7 @@ local post_errors = {
 	post_auth = { code = 403, condition = "not-authorized", text = "Not authorized to send stanza with requested 'from'", },
 	iq_type = { code = 422, condition = "invalid-xml", text = "'iq' stanza must be of type 'get' or 'set'", },
 	iq_tags = { code = 422, condition = "bad-format", text = "'iq' stanza must have exactly one child tag", },
+	mediatype = { code = 415, condition = "bad-format", text = "Unsupported media type" },
 };
 
 local function handle_post(event)
@@ -146,7 +147,11 @@ local function handle_post(event)
 	local payload, err = parse(request.headers.content_type, request.body);
 	if not payload then
 		-- parse fail
-		return errors.new("parse", { error = err, type = request.headers.content_type, data = request.body, }, post_errors);
+		local ctx = { error = err, type = request.headers.content_type, data = request.body, };
+		if err == "unknown-payload-type" then
+			return errors.new("mediatype", ctx, post_errors);
+		end
+		return errors.new("parse", ctx, post_errors);
 	end
 	if payload.attr.xmlns then
 		return errors.new("xmlns", nil, post_errors);
