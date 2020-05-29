@@ -13,6 +13,7 @@ field_mappings = {
 	to = "attr",
 	from = "attr",
 	id = "attr",
+	lang = "attr",
 
 	-- basic message
 	body = "text_tag",
@@ -444,6 +445,7 @@ local function st2json(s)
 		to = s.attr.to,
 		from = s.attr.from,
 		id = s.attr.id,
+		lang = s.attr["xml:lang"],
 	};
 	if s.name == "presence" and not s.attr.type then
 		t.type = "available";
@@ -538,6 +540,7 @@ local function json2st(t)
 		to = str(t.to) and jid.prep(t.to);
 		from = str(t.to) and jid.prep(t.from);
 		id = str(t.id),
+		["xml:lang"] = str(t.lang),
 	});
 
 	if t.to and not s.attr.to then
