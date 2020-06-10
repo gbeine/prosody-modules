@@ -4,6 +4,7 @@ local id = require "util.id";
 
 local pubsub = module:depends "pubsub".service;
 
+local xmlns_quick_resp = "urn:xmpp:tmp:quick-response";
 local name = module:get_option_string("name", "PubSub Service on "..module.host);
 local help = name..[[
 
@@ -33,6 +34,8 @@ module:hook("message/host", function (event)
 
 	if command == "help" then
 		reply:body(help);
+		reply:tag("response", { xmlns = xmlns_quick_resp, value = "list", }):up();
+		reply:tag("response", { xmlns = xmlns_quick_resp, value = "subscriptions", }):up();
 	elseif command == "list" then
 		local ok, nodes = pubsub:get_nodes(from);
 		if ok then
@@ -54,6 +57,8 @@ module:hook("message/host", function (event)
 			local response = {};
 			for i = 1, #subs do
 				response[i] = string.format("- `%s`", subs[i].node);
+				reply:tag("response", { xmlns = xmlns_quick_resp, value = "unsubscribe "..subs[i].node, }):up();
+				reply:tag("response", { xmlns = xmlns_quick_resp, value = "last "..subs[i].node, }):up();
 			end
 			reply:body(table.concat(response, "\n"));
 		end
@@ -77,6 +82,7 @@ module:hook("message/host", function (event)
 		end
 	else
 		reply:body("Unknown command. `help` to list commands.");
+		reply:tag("response", { xmlns = xmlns_quick_resp, value = "help", }):up();
 	end
 	reply:reset();
 
