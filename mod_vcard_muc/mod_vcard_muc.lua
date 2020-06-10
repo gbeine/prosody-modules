@@ -60,6 +60,10 @@ local function handle_vcard(event)
 	local room_jid = stanza.attr.to;
 	local room_node = jid_split(room_jid);
 	local room = get_room_from_jid(room_jid);
+	if not room then
+		session.send(st.error_reply(stanza, "cancel", "item-not-found"))
+		return true;
+	end
 
 	local from = stanza.attr.from;
 	local from_affiliation = room:get_affiliation(from);
