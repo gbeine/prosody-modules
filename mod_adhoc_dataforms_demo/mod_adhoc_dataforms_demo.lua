@@ -172,6 +172,7 @@ local function multi_step_command(_, data, state)
 	return next_step, state;
 end
 
+module:depends("adhoc");
 module:provides("adhoc",
 	adhoc_new("Multi-step command demo",
 		"xmpp:zash.se/mod_adhoc_dataforms_demo#multi",
