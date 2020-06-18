@@ -67,6 +67,7 @@ local function get_converse_options()
 		bosh_service_url = has_bosh and module:http_url("bosh","/http-bind") or nil;
 		websocket_url = has_ws and module:http_url("websocket","xmpp-websocket"):gsub("^http", "ws") or nil;
 		authentication = module:get_option_string("authentication") == "anonymous" and "anonymous" or "login";
+		discover_connection_methods = false;
 		jid = module.host;
 		default_domain = module.host;
 		domain_placeholder = module.host;
