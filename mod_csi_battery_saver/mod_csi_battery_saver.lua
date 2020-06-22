@@ -150,6 +150,10 @@ end
 
 module:hook("csi-client-inactive", function (event)
 	local session = event.origin;
+	if not session.resource then
+		session.log("warn", "Ignoring csi if no resource is bound!");
+		return;
+	end
 	if session.pump then
 		session.log("debug", "mod_csi_battery_saver(%s): Client is inactive, buffering unimportant outgoing stanzas", id);
 		session.pump:pause();
@@ -179,6 +183,10 @@ end);
 
 module:hook("csi-client-active", function (event)
 	local session = event.origin;
+	if not session.resource then
+		session.log("warn", "Ignoring csi if no resource is bound!");
+		return;
+	end
 	if session.pump then
 		session.log("debug", "mod_csi_battery_saver(%s): Client is active, resuming direct delivery", id);
 		session.pump:resume();
