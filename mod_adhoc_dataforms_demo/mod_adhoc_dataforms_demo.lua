@@ -154,6 +154,7 @@ local function multi_step_command(_, data, state)
 			repeat
 				random = math.random(2, #form);
 			until not already_selected[random]
+			already_selected[random] = true;
 			table.insert(current_form, form[random]);
 		end
 		state.forms[state.step] = dataforms.new(current_form);
