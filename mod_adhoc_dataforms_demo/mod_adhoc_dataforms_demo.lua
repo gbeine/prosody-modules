@@ -134,6 +134,12 @@ local function multi_step_command(_, data, state)
 				.. serialization.serialize(state, { fatal = false }),
 		};
 	end
+	if state and data.action == "execute" then
+		data.action = "next";
+	elseif not state and data.action == "next" then
+		-- Prevent jumping directly to step 2
+		return { status = "canceled", error = "Invalid action" };
+	end
 	state = state or { step = 1, forms = { } };
 
 	if data.action == "next" then
@@ -163,6 +169,7 @@ local function multi_step_command(_, data, state)
 	local next_step = {
 		status = "executing",
 		form = current_form,
+		default = "next",
 		actions = {
 			"next", "complete"
 		},
