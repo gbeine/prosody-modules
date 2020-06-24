@@ -12,6 +12,6 @@ module:hook("spam_reporting/spam-report", function(event)
 		do
 			module:send(st.message({from=host,
 			type="chat",to=admin_jid},
-                       report));
+                	report));
 		end
 end)
