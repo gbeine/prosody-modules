@@ -95,3 +95,7 @@ end
 function get_user_read_marker(user_jid, room_jid)
 	return muc_marker_map_store:get(user_jid, room_jid);
 end
+
+function is_markable(stanza)
+	return not not stanza:get_child("markable", xmlns_markers);
+end
