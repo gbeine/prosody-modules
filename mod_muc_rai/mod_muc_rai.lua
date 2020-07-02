@@ -211,11 +211,11 @@ end);
 
 module:hook("muc-broadcast-message", function (event)
 	local room, stanza = event.room, event.stanza;
-	local archive_id = stanza:get_child_text("stanza-id", "urn:xmpp:sid:0");
-	if archive_id then
+	local archive_id = stanza:get_child("stanza-id", "urn:xmpp:sid:0");
+	if archive_id and archive_id.attr.id then
 		-- Remember the id of the last message so we can compare it
 		-- to the per-user marker (managed by mod_muc_markers)
-		update_room_activity(room.jid, archive_id);
+		update_room_activity(room.jid, archive_id.attr.id);
 		-- Notify any users that need to be notified
 		notify_interested_users(room.jid);
 	end
