@@ -121,7 +121,7 @@ local function update_room_activity(room_jid, last_id)
 end
 
 local function get_last_user_read_id(user_jid, room_jid)
-	return muc_markers.get_user_read_marker(user_jid, room_jid);
+	return muc_markers.get_user_read_marker(jid.bare(user_jid), room_jid);
 end
 
 local function has_new_activity(room_jid, user_jid)
