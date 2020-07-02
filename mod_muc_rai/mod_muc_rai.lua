@@ -127,6 +127,11 @@ end
 local function has_new_activity(room_jid, user_jid)
 	local last_room_message_id = get_last_room_message_id(room_jid);
 	local last_user_read_id = get_last_user_read_id(user_jid, room_jid);
+	module:log("debug", "Checking activity in <%s> (%s) for <%s> (%s): %s",
+		room_jid, last_room_message_id,
+		user_jid, last_user_read_id,
+		tostring(last_room_message_id ~= last_user_read_id)
+	);
 	return last_room_message_id ~= last_user_read_id;
 end
 
