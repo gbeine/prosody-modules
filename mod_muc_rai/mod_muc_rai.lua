@@ -158,7 +158,7 @@ local function subscribe_all_rooms(user_jid)
 		interested_rooms = {};
 	end
 
-	if not subscribed_users:set(user_jid, interested_rooms) then
+	if not subscribed_users:set(user_jid, {}) then
 		module:log("warn", "Subscriber limit (%d) reached, rejecting subscription from %s", max_subscribers, user_jid);
 		return nil, "resource-constraint";
 	end
