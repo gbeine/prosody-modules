@@ -2,7 +2,7 @@
 depends:
 - 'mod\_spam\_reporting'
 labels:
-- 'Stage-Alpha'
+- 'Stage-Beta'
 summary: 'Notify admins about incoming XEP-0377 spam reports'
 ---
 
