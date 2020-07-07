@@ -8,12 +8,29 @@
 -- Notably Conversations will ack the origin-id instead. We need to update the XEP to
 -- clarify the correct behaviour.
 
+local set = require "util.set";
 local st = require "util.stanza";
 
 local xmlns_markers = "urn:xmpp:chat-markers:0";
 
+local marker_order = { "received", "displayed", "acknowledged" };
+
+-- Add reverse mapping
+for priority, name in ipairs(marker_order) do
+	marker_order[name] = priority;
+end
+
 local marker_element_name = module:get_option_string("muc_marker_type", "displayed");
-local marker_element_names = module:get_option_set("muc_marker_types", { marker_element_name });
+
+assert(marker_order[marker_element_name], "invalid marker name: "..marker_element_name);
+
+local marker_element_names = set.new();
+
+-- "displayed" implies "received", etc. so we'll add the
+-- chosen marker and any "higher" ones to the set
+for i = marker_order[marker_element_name], #marker_order do
+	marker_element_names:add(marker_order[i]);
+end
 
 local muc_marker_map_store = module:open_store("muc_markers", "map");
 
@@ -52,10 +69,10 @@ module:hook("muc-occupant-groupchat", function (event)
 end);
 
 module:hook("muc-message-is-historic", function (event)
-	local marker = event.stanza:get_child("received", xmlns_markers);
+	local marker = event.stanza:get_child(nil, xmlns_markers)
 
 	-- Prevent stanza from reaching the archive (it's just noise)
-	if marker then
+	if marker and marker_element_names:contains(marker.name) then
 		return false
 	end
 end);
@@ -82,7 +99,7 @@ module:hook("muc-occupant-session-new", function (event)
 		local room_nick = find_nickname(room, user_jid);
 		if room_nick then
 			local recv_marker = st.message({ type = "groupchat", from = room_nick, to = to })
-				:tag("received", { xmlns = xmlns_markers, id = id });
+				:tag(marker_element_name, { xmlns = xmlns_markers, id = id });
 			room:route_stanza(recv_marker);
 		end
 	end
