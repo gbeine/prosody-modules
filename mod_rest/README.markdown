@@ -12,7 +12,14 @@ services.
 
 # Usage
 
-## Enabling
+## On VirtualHosts
+
+```lua
+VirtualHost "example.com"
+modules_enabled = {"rest"}
+```
+
+## As a Component
 
 ``` {.lua}
 Component "rest.example.net" "rest"
