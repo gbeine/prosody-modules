@@ -89,7 +89,6 @@ TL;DR: Set this webhook callback URL, get XML `POST`-ed there.
 
 ``` {.lua}
 Component "rest.example.net" "rest"
-rest_credentials = "Bearer dmVyeSBzZWNyZXQgdG9rZW4K"
 rest_callback_url = "http://my-api.example:9999/stanzas"
 ```
 
