@@ -23,8 +23,14 @@ modules_enabled = {"rest"}
 
 ``` {.lua}
 Component "rest.example.net" "rest"
-rest_credentials = "Bearer dmVyeSBzZWNyZXQgdG9rZW4K"
+component_secret = "dmVyeSBzZWNyZXQgdG9rZW4K"
+modules_enabled = {"http_oauth2"}
 ```
+
+## OAuth2
+
+[mod_http_oauth2] can be used to grant bearer tokens which are
+accepted by mod_rest.
 
 ## Sending stanzas
 
@@ -35,7 +41,7 @@ To try it, simply `curl` an XML stanza payload:
 
 ``` {.sh}
 curl https://prosody.example:5281/rest \
-    --oauth2-bearer dmVyeSBzZWNyZXQgdG9rZW4K \
+    --user username \
     -H 'Content-Type: application/xmpp+xml' \
     --data-binary '<message type="chat" to="user@example.org">
             <body>Hello!</body>
