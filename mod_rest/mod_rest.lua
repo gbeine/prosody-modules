@@ -111,6 +111,7 @@ local supported_inputs = {
 local supported_outputs = {
 	"application/xmpp+xml",
 	"application/json",
+	"application/x-www-form-urlencoded",
 };
 
 if have_cbor then
@@ -118,9 +119,27 @@ if have_cbor then
 	table.insert(supported_outputs, "application/cbor");
 end
 
+-- Only { string : string } can be form-encoded, discard the rest
+-- (jsonmap also discards anything unknown or unsupported)
+local function flatten(t)
+	local form = {};
+	for k, v in pairs(t) do
+		if type(v) == "string" then
+			form[k] = v;
+		elseif type(v) == "number" then
+			form[k] = tostring(v);
+		elseif v == true then
+			form[k] = "";
+		end
+	end
+	return form;
+end
+
 local function encode(type, s)
 	if type == "application/json" then
 		return json.encode(jsonmap.st2json(s));
+	elseif type == "application/x-www-form-urlencoded" then
+		return http.formencode(flatten(jsonmap.st2json(s)));
 	elseif type == "application/cbor" then
 		return cbor.encode(jsonmap.st2json(s));
 	elseif type == "text/plain" then
