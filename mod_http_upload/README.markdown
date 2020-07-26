@@ -87,7 +87,7 @@ By default, uploaded files are put in a sub-directory of the default
 Prosody storage path (usually `/var/lib/prosody`). This can be changed:
 
 ``` {.lua}
-http_upload_path = "/path/to/uploded/files"
+http_upload_path = "/path/to/uploaded/files"
 ```
 
 Compatibility
