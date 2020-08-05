@@ -63,7 +63,7 @@ module:hook("muc-occupant-groupchat", function (event)
 	end
 
 	-- Store the id that the user has received to
-	module:log("warn", "New marker for %s: %s", event.occupant.bare_jid, marker.attr.id);
+	module:log("warn", "New marker for %s in %s: %s", event.occupant.bare_jid, event.room.jid, marker.attr.id);
 	muc_marker_map_store:set(event.occupant.bare_jid, event.room.jid, marker.attr.id);
 
 end);
