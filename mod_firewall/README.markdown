@@ -636,7 +636,7 @@ name. These functions are:
 
 For example, to apply a rate limit to stanzas per sender domain:
 
-    LIMIT normal on $<@from|domain>
+    LIMIT normal on $<@from|host>
 
 If the path does not match (e.g. the element isn't found, or the attribute doesn't exist) or any of the functions fail to produce an output (e.g. an invalid
 JID was passed to a function that only handles valid JIDs) the expression will return the text `<undefined>`. You can override this by ending the expression
