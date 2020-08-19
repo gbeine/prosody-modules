@@ -195,6 +195,10 @@ module:hook("presence/host", function (event)
 		return true;
 	end
 
+	if not stanza:get_child("rai", xmlns_rai) then
+		return; -- Ignore, no <rai/> tag
+	end
+
 	local rooms_with_activity, err = subscribe_all_rooms(user_jid);
 
 	if not rooms_with_activity then
