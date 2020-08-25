@@ -41,6 +41,10 @@ if file_size_limit > parser_body_limit then
 	file_size_limit = parser_body_limit;
 end
 
+if prosody.hosts[module.host].type == "local" then
+	module:log("warn", "mod_%s loaded on a user host, this may be incompatible with some client software, see docs for correct usage", module.name);
+end
+
 -- depends
 module:depends("http");
 module:depends("disco");
