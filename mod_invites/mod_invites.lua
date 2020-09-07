@@ -14,7 +14,7 @@ local function get_uri(action, jid, token, params) --> string
 		});
 end
 
-local function create_invite(invite_action, invite_jid, allow_registration)
+local function create_invite(invite_action, invite_jid, allow_registration, additional_data)
 	local token = id.medium();
 
 	local created_at = os.time();
@@ -28,6 +28,7 @@ local function create_invite(invite_action, invite_jid, allow_registration)
 
 		token = token;
 		allow_registration = allow_registration;
+		additional_data = additional_data;
 
 		uri = get_uri(invite_action, invite_jid, token, invite_params);
 
@@ -58,14 +59,14 @@ local function create_invite(invite_action, invite_jid, allow_registration)
 end
 
 -- Create invitation to register an account (optionally restricted to the specified username)
-function create_account(account_username) --luacheck: ignore 131/create_account
+function create_account(account_username, additional_data) --luacheck: ignore 131/create_account
 	local jid = account_username and (account_username.."@"..module.host) or module.host;
-	return create_invite("register", jid, true);
+	return create_invite("register", jid, true, additional_data);
 end
 
 -- Create invitation to become a contact of a local user
-function create_contact(username, allow_registration) --luacheck: ignore 131/create_contact
-	return create_invite("roster", username.."@"..module.host, allow_registration);
+function create_contact(username, allow_registration, additional_data) --luacheck: ignore 131/create_contact
+	return create_invite("roster", username.."@"..module.host, allow_registration, additional_data);
 end
 
 local valid_invite_methods = {};
@@ -120,6 +121,7 @@ function get(token, username)
 		token = token;
 		username = username;
 		inviter = inviter;
+		additional_data = token_info and token_info.additional_data or nil;
 	}, valid_invite_mt);
 end
 
