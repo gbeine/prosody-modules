@@ -182,6 +182,14 @@ module:hook("user-registered", function (event)
 		subscribe_both(module.host, inviter_username, contact_username);
 	end
 
+	if validated_invite.additional_data then
+		module:log("debug", "Importing roles from invite");
+		local roles = validated_invite.additional_data.roles;
+		if roles then
+			module:open_store("roles"):set(contact_username, roles);
+		end
+	end
+end);
 
 end);
 
