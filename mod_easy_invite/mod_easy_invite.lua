@@ -226,6 +226,7 @@ function module.command(arg)
 	assert(hosts[host], "Host "..tostring(host).." does not exist");
 	sm.initialize_host(host);
 
+	-- Load mod_invites
 	invites = module:context(host):depends("invites");
 	local invite = invites.create_account();
 	print(invite.uri);
