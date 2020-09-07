@@ -110,7 +110,7 @@ function get(token, username)
 		valid_until = token_storage:get(username, token);
 	else -- token being used for account creation
 		valid_until = token_info and token_info.expires;
-		if token_info.type == "roster" then
+		if token_info and token_info.type == "roster" then
 			username = jid_node(token_info.jid);
 			inviter = username;
 		end
