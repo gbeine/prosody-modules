@@ -174,14 +174,15 @@ module:hook("user-registered", function (event)
 		return;
 	end
 	local inviter_username = validated_invite.inviter;
+	local contact_username = event.username;
 	validated_invite:use();
 
-	if not inviter_username then return; end
+	if inviter_username then
+		module:log("debug", "Creating mutual subscription between %s and %s", inviter_username, contact_username);
+		subscribe_both(module.host, inviter_username, contact_username);
+	end
 
-	local contact_username = event.username;
 
-	module:log("debug", "Creating mutual subscription between %s and %s", inviter_username, contact_username);
-	subscribe_both(module.host, inviter_username, contact_username);
 end);
 
 do
