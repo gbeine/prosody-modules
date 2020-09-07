@@ -74,6 +74,7 @@ function create_contact(username, allow_registration, additional_data) --luachec
 	return create_invite("roster", username.."@"..module.host, allow_registration, additional_data);
 end
 
+
 local valid_invite_methods = {};
 local valid_invite_mt = { __index = valid_invite_methods };
 
