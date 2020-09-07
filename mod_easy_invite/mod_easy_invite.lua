@@ -143,6 +143,9 @@ module:hook("user-registering", function (event)
 		event.reason = "Registration on this server is through invitation only";
 		return;
 	end
+	if validated_invite.additional_data and validated_invite.additional_data.allow_reset then
+		event.allow_reset = validated_invite.additional_data.allow_reset;
+	end
 end);
 
 -- Make a *one-way* subscription. User will see when contact is online,
@@ -191,6 +194,14 @@ module:hook("user-registered", function (event)
 	end
 end);
 
+-- Equivalent of user-registered but for when the account already existed
+-- (i.e. password reset)
+module:hook("user-password-reset", function (event)
+	local validated_invite = event.validated_invite or (event.session and event.session.validated_invite);
+	if not validated_invite then
+		return;
+	end
+	validated_invite:use();
 end);
 
 do
