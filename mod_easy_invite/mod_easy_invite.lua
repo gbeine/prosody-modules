@@ -5,6 +5,7 @@ local jid_bare = require "util.jid".bare;
 local jid_split = require "util.jid".split;
 local split_jid = require "util.jid".split;
 local rostermanager = require "core.rostermanager";
+local modulemanager = require "core.modulemanager";
 local st = require "util.stanza";
 
 local invite_only = module:get_option_boolean("registration_invite_only", true);
@@ -247,7 +248,10 @@ function module.command(arg)
 
 	-- Load mod_invites
 	invites = module:context(host):depends("invites");
-	module:context(host):depends("invites_page");
+	local invites_page_module = module:context(host):get_option_string("easy_invite_page_module", "invites_page");
+	if modulemanager.get_modules_for_host(host):contains(invites_page_module) then
+		module:context(host):depends(invites_page_module);
+	end
 
 	table.remove(arg, 1);
 	table.remove(arg, 1);
