@@ -101,12 +101,13 @@ function get(token, username)
 
 	local valid_until, inviter;
 
+	-- Fetch from host store (account invite)
+	local token_info = token_storage:get(nil, token);
+
 	if username then -- token being used for subscription
 		-- Fetch from user store (subscription invite)
 		valid_until = token_storage:get(username, token);
 	else -- token being used for account creation
-		-- Fetch from host store (account invite)
-		local token_info = token_storage:get(nil, token);
 		valid_until = token_info and token_info.expires;
 		if token_info.type == "roster" then
 			username = jid_node(token_info.jid);
@@ -126,6 +127,8 @@ function get(token, username)
 		token = token;
 		username = username;
 		inviter = inviter;
+		type = token_info and token_info.type or "roster";
+		uri = token_info and token_info.uri or get_uri("roster", username.."@"..module.host, token);
 		additional_data = token_info and token_info.additional_data or nil;
 	}, valid_invite_mt);
 end
