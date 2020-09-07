@@ -247,7 +247,28 @@ function module.command(arg)
 
 	-- Load mod_invites
 	invites = module:context(host):depends("invites");
-	local invite = invites.create_account();
-	print(invite.uri);
-end
+	module:context(host):depends("invites_page");
 
+	table.remove(arg, 1);
+	table.remove(arg, 1);
+
+	local invite, roles;
+	if arg[1] == "--reset" then
+		local nodeprep = require "util.encodings".stringprep.nodeprep;
+		local username = nodeprep(arg[2]);
+		if not username then
+			print("Please supply a valid username to generate a reset link for");
+			return;
+		end
+		invite = invites.create_account_reset(username);
+	else
+		if arg[1] == "--admin" then
+			roles = { ["prosody:admin"] = true };
+		elseif arg[1] == "--role" then
+			roles = { [arg[2]] = true };
+		end
+		invite = invites.create_account(nil, { roles = roles });
+	end
+
+	print(invite.landing_page or invite.uri);
+end
