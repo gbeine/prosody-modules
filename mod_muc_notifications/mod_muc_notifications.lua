@@ -44,7 +44,7 @@ local function handle_muc_message(event)
 					xmlns = "http://quobis.com/xmpp/muc#push",
 					jid = room.jid,
 				}
-				local reason = "You have messages in group chat "..room:get_name()
+				local reason = "You have messages in group chat "..(room:get_name() or room.jid)
 				local notification = st.message(attrs)
 					:body(reason):up()
 					:tag("notification", not_attrs):up()
