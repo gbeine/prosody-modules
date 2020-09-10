@@ -1,3 +1,8 @@
+---
+rockspec:
+  dependencies:
+  - mod_invites
+---
 
 This module allows admins and users to create invitations suitable for sharing
 to potential new users/contacts.
