@@ -1,10 +1,14 @@
 local id = require "util.id";
 local url = require "socket.url";
 local jid_node = require "util.jid".node;
+local jid_split = require "util.jid".split;
 
 local invite_ttl = module:get_option_number("invite_expiry", 86400 * 7);
 
-local token_storage = module:open_store("invite_token", "map");
+local token_storage;
+if prosody.process_type == "prosody" or prosody.shutdown then
+	token_storage = module:open_store("invite_token", "map");
+end
 
 local function get_uri(action, jid, token, params) --> string
 	return url.build({
@@ -85,6 +89,7 @@ function valid_invite_methods:use()
 		token_storage:set(self.username, self.token, nil);
 	end
 	token_storage:set(nil, self.token, nil);
+
 	return true;
 end
 
@@ -137,4 +142,81 @@ end
 function use(token) --luacheck: ignore 131/use
 	local invite = get(token);
 	return invite and invite:use();
+end
+
+--- shell command
+do
+	-- Since the console is global this overwrites the command for
+	-- each host it's loaded on, but this should be fine.
+
+	local get_module = require "core.modulemanager".get_module;
+
+	local console_env = module:shared("/*/admin_shell/env");
+
+	-- luacheck: ignore 212/self
+	console_env.invite = {};
+	function console_env.invite:create_account(user_jid)
+		local username, host = jid_split(user_jid);
+		local mod_invites, err = get_module(host, "invites");
+		if not mod_invites then return nil, err or "mod_invites not loaded on this host"; end
+		local invite, err = mod_invites.create_account(username);
+		if not invite then return nil, err; end
+		return true, invite.uri;
+	end
+
+	function console_env.invite:create_contact(user_jid, allow_registration)
+		local username, host = jid_split(user_jid);
+		local mod_invites, err = get_module(host, "invites");
+		if not mod_invites then return nil, err or "mod_invites not loaded on this host"; end
+		local invite, err = mod_invites.create_contact(username, allow_registration);
+		if not invite then return nil, err; end
+		return true, invite.uri;
+	end
+end
+
+--- prosodyctl command
+function module.command(arg)
+	if #arg < 2 or arg[1] ~= "generate" then
+		print("usage: prosodyctl mod_"..module.name.." generate example.com");
+		return;
+	end
+	table.remove(arg, 1); -- pop command
+
+	local sm = require "core.storagemanager";
+	local mm = require "core.modulemanager";
+
+	local host = arg[1];
+	assert(hosts[host], "Host "..tostring(host).." does not exist");
+	sm.initialize_host(host);
+	table.remove(arg, 1); -- pop host
+	module.host = host;
+	token_storage = module:open_store("invite_token", "map");
+
+	-- Load mod_invites
+	local invites = module:depends("invites");
+	local invites_page_module = module:get_option_string("invites_page_module", "invites_page");
+	if mm.get_modules_for_host(host):contains(invites_page_module) then
+		module:depends(invites_page_module);
+	end
+
+
+	local invite, roles;
+	if arg[1] == "--reset" then
+		local nodeprep = require "util.encodings".stringprep.nodeprep;
+		local username = nodeprep(arg[2]);
+		if not username then
+			print("Please supply a valid username to generate a reset link for");
+			return;
+		end
+		invite = assert(invites.create_account_reset(username));
+	else
+		if arg[1] == "--admin" then
+			roles = { ["prosody:admin"] = true };
+		elseif arg[1] == "--role" then
+			roles = { [arg[2]] = true };
+		end
+		invite = assert(invites.create_account(nil, { roles = roles }));
+	end
+
+	print(invite.landing_page or invite.uri);
 end
