@@ -60,8 +60,8 @@ function module.command(arg)
 		for event, data in pairs(lastlog) do
 			print(("Last %s: %s"):format(event,
 				data.timestamp and os.date("%Y-%m-%d %H:%M:%S", data.timestamp) or "<unknown>"));
-			if lastlog.ip then
-				print("IP address: "..lastlog.ip);
+			if data.ip then
+				print("IP address: "..data.ip);
 			end
 		end
 	else
