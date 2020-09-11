@@ -23,7 +23,6 @@ local render_url = require "util.interpolation".new("%b{}", url_escape, {
 });
 
 module:depends("register_apps");
-module:depends("invites_register_web");
 
 local site_name = module:get_option_string("site_name", module.host);
 local site_apps = module:shared("register_apps/apps");
