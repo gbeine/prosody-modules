@@ -1,8 +1,9 @@
 ---
-depends:
-- 'mod\_spam\_reporting'
 labels:
 - 'Stage-Beta'
+rockspec:
+  dependencies:
+  - mod_spam_reporting
 summary: 'Notify admins about incoming XEP-0377 spam reports'
 ---
 

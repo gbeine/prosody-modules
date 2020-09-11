@@ -1,6 +1,7 @@
 ---
-depends:
-- 'mod\_track\_muc\_joins'
+rockspec:
+  dependencies:
+  - mod_track_muc_joins
 summary: Limit rate of outgoing unsolicited messages
 ---
 

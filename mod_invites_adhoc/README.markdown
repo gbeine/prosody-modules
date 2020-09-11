@@ -1,6 +1,9 @@
 ---
 labels:
 - 'Stage-Beta'
+rockspec:
+  dependencies:
+  - invites
 summary: 'Enable ad-hoc command for XMPP clients to create invitations'
 ...
 

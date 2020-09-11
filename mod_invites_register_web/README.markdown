@@ -2,6 +2,12 @@
 labels:
 - 'Stage-Beta'
 summary: 'Register accounts via the web using invite tokens'
+rockspec:
+  dependencies:
+  - easy_invite
+  - invites
+  - invites_page
+  - register_apps
 ...
 
 Introduction

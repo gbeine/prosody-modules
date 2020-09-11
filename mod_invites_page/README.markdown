@@ -2,6 +2,15 @@
 labels:
 - 'Stage-Beta'
 summary: 'Generate friendly web page for invitations'
+rockspec:
+  dependencies:
+  - invites
+  - invites_register_web
+  - register_apps
+  build:
+    copy_directories:
+    - html
+    - static
 ...
 
 Introduction
