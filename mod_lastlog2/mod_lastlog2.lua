@@ -29,8 +29,7 @@ end);
 
 module:hook("user-registered", function(event)
 	local session = event.session;
-	store:set(event.username, "lastlog", {
-		event = "registered";
+	store:set(event.username, "registered", {
 		timestamp = time(),
 		ip = log_ip and session and session.ip or nil,
 	});
