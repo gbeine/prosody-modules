@@ -15,7 +15,7 @@ local site_name = module:get_option_string("site_name", module.host);
 local site_apps = module:shared("register_apps/apps");
 
 module:depends("http");
-module:depends("easy_invite");
+
 local invites = module:depends("invites");
 local invites_page = module:depends("invites_page");
 
