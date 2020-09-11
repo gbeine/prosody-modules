@@ -10,9 +10,11 @@ This module adds additional metadata to media shared in a MUC. This can help cli
 make decisions and provide better UI and enhanced privacy, by knowing things like file
 size without needing to make external network requests.
 
+::: {.alert .alert-danger}
 **NOTE:** This is an experimental module. It is not supported by any
 clients, and therefore is mainly of interest to client developers who
 wish to explore the idea.
+:::
 
 # Configuring
 
