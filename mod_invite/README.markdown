@@ -1,8 +1,11 @@
 ---
 labels:
-- 'Stage-Alpha'
+- 'Stage-Deprecated'
 summary: 'Allows users to invite new users'
 ...
+
+**NOTE:** This module has been deprecated. Its functionality has been
+moved to other modules, see the mod_invites documentation for details.
 
 Introduction
 ============
