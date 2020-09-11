@@ -1,8 +1,18 @@
+---
+labels:
+- 'Stage-Alpha'
+summary: 'Experimental module to add metadata to media in MUCs'
+...
+
 # Introduction
 
 This module adds additional metadata to media shared in a MUC. This can help clients
 make decisions and provide better UI and enhanced privacy, by knowing things like file
 size without needing to make external network requests.
+
+**NOTE:** This is an experimental module. It is not supported by any
+clients, and therefore is mainly of interest to client developers who
+wish to explore the idea.
 
 # Configuring
 
