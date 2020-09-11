@@ -4,10 +4,10 @@ labels:
 summary: 'Register accounts via the web using invite tokens'
 rockspec:
   dependencies:
-  - easy_invite
-  - invites
-  - invites_page
-  - register_apps
+  - mod_easy_invite
+  - mod_invites
+  - mod_invites_page
+  - mod_register_apps
 ...
 
 Introduction
