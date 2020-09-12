@@ -90,7 +90,7 @@ local app_config = module:get_option("site_apps", {
 		platforms = { "Windows", "Linux" };
 		download = {
 			buttons = {
-				{ 
+				{
 					text = "Download Gajim";
 					url = "https://gajim.org/download/";
 					target = "_blank";
@@ -110,11 +110,18 @@ end
 
 local site_apps = module:shared("apps");
 
+for k, v in pairs(site_apps) do
+	if v._source == module.name then
+		site_apps[k] = nil;
+	end
+end
+
 for _, app_info in ipairs(app_config) do
 	local app_id = app_info.id or app_info.name:gsub("%W+", "-"):lower();
 	app_info.id = app_id;
 	app_info.image = relurl(app_info.image);
 	site_apps[app_id] = app_info;
+	app_info._source = module.name;
 	table.insert(site_apps, app_info);
 end
 
