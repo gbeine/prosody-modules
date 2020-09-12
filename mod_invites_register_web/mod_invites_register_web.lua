@@ -22,14 +22,14 @@ local invites_page = module:depends("invites_page");
 function serve_register_page(event)
 	local register_page_template = assert(module:load_resource("html/register.html")):read("*a");
 
-	local query_params = http_formdecode(event.request.url.query);
+	local query_params = event.request.url.query and http_formdecode(event.request.url.query);
 
-	local invite = invites.get(query_params.t);
+	local invite = query_params and invites.get(query_params.t);
 	if not invite then
 		return {
 			status_code = 303;
 			headers = {
-				["Location"] = invites.module:http_url().."?"..event.request.url.query;
+				["Location"] = invites.module:http_url().."?"..(event.request.url.query or "");
 			};
 		};
 	end
