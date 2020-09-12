@@ -122,7 +122,7 @@ end
 for _, app_info in ipairs(app_config) do
 	local app_id = app_info.id or app_info.name:gsub("%W+", "-"):lower();
 	if (not show_apps or show_apps:contains(app_id))
-	and not hide_apps:contains(app_id) then
+	and not (hide_apps and hide_apps:contains(app_id)) then
 		app_info.id = app_id;
 		app_info.image = relurl(app_info.image);
 		site_apps[app_id] = app_info;
