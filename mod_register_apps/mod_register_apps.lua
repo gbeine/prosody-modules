@@ -100,6 +100,9 @@ local app_config = module:get_option("site_apps", {
 	};
 });
 
+local show_apps = module:get_option_set("site_apps_show");
+local hide_apps = module:get_option_set("site_apps_hide");
+
 local base_url = module.http_url and module:http_url();
 local function relurl(s)
 	if s:match("^%w+://") then
@@ -118,11 +121,14 @@ end
 
 for _, app_info in ipairs(app_config) do
 	local app_id = app_info.id or app_info.name:gsub("%W+", "-"):lower();
-	app_info.id = app_id;
-	app_info.image = relurl(app_info.image);
-	site_apps[app_id] = app_info;
-	app_info._source = module.name;
-	table.insert(site_apps, app_info);
+	if (not show_apps or show_apps:contains(app_id))
+	and not hide_apps:contains(app_id) then
+		app_info.id = app_id;
+		app_info.image = relurl(app_info.image);
+		site_apps[app_id] = app_info;
+		app_info._source = module.name;
+		table.insert(site_apps, app_info);
+	end
 end
 
 local mime_map = {

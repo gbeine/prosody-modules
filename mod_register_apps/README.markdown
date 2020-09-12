@@ -16,7 +16,24 @@ them over HTTP for other modules to reference when serving web pages.
 
 # Configuration
 
-There is one configuration option, `site_apps`, which contains the list
+| Field                | Description                                                              |
+|----------------------|--------------------------------------------------------------------------|
+| site_apps            | A list of apps and their metadata                                        |
+| site_apps_show       | A list of app ids to only show                                           |
+| site_apps_hide       | A list of app ids to never show                                          |
+
+An "app id" is the lower case app name, with any spaces replaced by `-`. E.g. "My Chat" would be `"my-chat"`.
+
+The module comes with a preconfigured `site_apps` containing popular clients. Patches are welcome to
+add/update this list as needed!
+
+If you want to limit to just displaying a subset of the apps on your server, use the `site_apps_show`
+option, e.g. `site_apps_show = { "conversations", "siskin-im" }`. To never show specific apps, you
+can use `site_apps_hide`, e.g. `site_apps_hide = { "pidgin" }`.
+
+# App metadata format
+
+The configuration option `site_apps` contains the list
 of apps and their metadata.
 
 ``` {.lua}
