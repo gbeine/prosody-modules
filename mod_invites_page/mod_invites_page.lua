@@ -98,6 +98,8 @@ function serve_invite_page(event)
 	template_vars.apps = render_app_urls(site_apps, template_vars);
 
 	local invite_page = render_html_template(invite_page_template, template_vars);
+
+	event.response.headers["Link"] = ([[<%s>; rel="alternate"]]):format(template_vars.uri);
 	return invite_page;
 end
 
