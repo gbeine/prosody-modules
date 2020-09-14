@@ -117,6 +117,7 @@ function handle_register_form(event)
 		validated_invite = invite;
 		username = prepped_username;
 		host = module.host;
+		ip = request.ip;
 		allowed = true;
 	};
 
