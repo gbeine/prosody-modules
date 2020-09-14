@@ -139,6 +139,7 @@ function handle_register_form(event)
 			host = module.host;
 			source = "mod_"..module.name;
 			validated_invite = invite;
+			ip = request.ip;
 		});
 
 		local app_info = site_apps[app_id];
