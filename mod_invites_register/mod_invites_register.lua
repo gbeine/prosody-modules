@@ -89,6 +89,11 @@ module:hook("user-registering", function (event)
 		event.allowed = false;
 		event.reason = "Registration on this server is through invitation only";
 		return;
+	elseif not validated_invite then
+		-- This registration is not using an invite, but
+		-- the server is not in invite-only mode, so nothing
+		-- for this module to do...
+		return;
 	end
 	if validated_invite and validated_invite.additional_data and validated_invite.additional_data.allow_reset then
 		event.allow_reset = validated_invite.additional_data.allow_reset;
