@@ -1,6 +1,4 @@
 ---
-labels:
-- 'Stage-Alpha'
 summary: 'Anonymous unique occupant identifiers for MUCs'
 ...
 
