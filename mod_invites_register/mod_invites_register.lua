@@ -90,7 +90,7 @@ module:hook("user-registering", function (event)
 		event.reason = "Registration on this server is through invitation only";
 		return;
 	end
-	if validated_invite.additional_data and validated_invite.additional_data.allow_reset then
+	if validated_invite and validated_invite.additional_data and validated_invite.additional_data.allow_reset then
 		event.allow_reset = validated_invite.additional_data.allow_reset;
 	end
 end);
