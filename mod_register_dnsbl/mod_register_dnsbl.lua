@@ -18,21 +18,22 @@ end
 
 module:hook("user-registering", function (event)
 	local session, ip = event.session, event.ip;
+	local log = (session and session.log) or module._log;
 	if not ip then
-		session.log("debug", "Unable to check DNSBL when IP is unknown");
+		log("debug", "Unable to check DNSBL when IP is unknown");
 		return;
 	end
 	local rbl_ip, err = reverse(ip, rbl);
 	if not rbl_ip then
-		session.log("debug", "Unable to check DNSBL for ip %s: %s", ip, err);
+		log("debug", "Unable to check DNSBL for ip %s: %s", ip, err);
 		return;
 	end
 
 	local wait, done = async.waiter();
 	adns.lookup(function (reply)
 		if reply and reply[1] and reply[1].a then
-			session.log("debug", "DNSBL response: %s IN A %s", rbl_ip, reply[1].a);
-			session.log("info", "Blocking %s from registering %s (dnsbl hit)", ip, event.username);
+			log("debug", "DNSBL response: %s IN A %s", rbl_ip, reply[1].a);
+			log("info", "Blocking %s from registering %s (dnsbl hit)", ip, event.username);
 			event.allowed = false;
 			event.reason = "Blocked by DNSBL";
 		end
