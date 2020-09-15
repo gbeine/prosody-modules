@@ -34,6 +34,8 @@ function serve_register_page(event)
 		};
 	end
 
+	event.response.headers["Content-Type"] = "text/html; charset=utf-8";
+
 	local invite_page = render_html_template(register_page_template, {
 		site_name = site_name;
 		token = invite.token;
@@ -66,7 +68,7 @@ function handle_register_form(event)
 		};
 	end
 
-	response.headers.content_type = "text/html; charset=utf-8";
+	event.response.headers["Content-Type"] = "text/html; charset=utf-8";
 
 	if not user or #user == 0 or not password or #password == 0 or not token then
 		return render_html_template(register_page_template, {

@@ -78,6 +78,8 @@ function serve_invite_page(event)
 	local invite_page_template = assert(module:load_resource("html/invite.html")):read("*a");
 	local invalid_invite_page_template = assert(module:load_resource("html/invite_invalid.html")):read("*a");
 
+	event.response.headers["Content-Type"] = "text/html; charset=utf-8";
+
 	local invite = invites.get(event.request.url.query);
 	if not invite then
 		return render_html_template(invalid_invite_page_template, {
@@ -106,6 +108,8 @@ end
 function serve_setup_page(event, app_id)
 	local invite_page_template = assert(module:load_resource("html/client.html")):read("*a");
 	local invalid_invite_page_template = assert(module:load_resource("html/invite_invalid.html")):read("*a");
+
+	event.response.headers["Content-Type"] = "text/html; charset=utf-8";
 
 	local invite = invites.get(event.request.url.query);
 	if not invite then
