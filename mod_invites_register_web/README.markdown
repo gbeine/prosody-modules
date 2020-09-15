@@ -7,6 +7,9 @@ rockspec:
   - mod_invites
   - mod_invites_page
   - mod_register_apps
+  build:
+    copy_directories:
+    - html
 ...
 
 Introduction
