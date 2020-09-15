@@ -14,7 +14,7 @@
 	<meta name="theme-color" content="#fbd308">
 </head>
 <body>
-	<div id="background" class="fixed-top overflow-hidden" aria-role="none presentation"></div>
+	<div id="background" class="fixed-top overflow-hidden"></div>
 	<div id="form" class="container col-md-10 col-md-offset-1 col-sm-8 col-sm-offset-2 col-lg-10 col-lg-offset-1 mt-2 mt-md-5">
 		<div class="card rounded-lg shadow">
 			<h1 class="card-header rounded-lg rounded-lg">
@@ -25,13 +25,11 @@
 					<strong>Tip:</strong> You can open this invite
 					on your mobile device by scanning a barcode with
 					your camera.
-					<a href="#qr-modal" class="mt-2 d-block" id="qr-modal-show">
-						<button class="btn btn-secondary" title="Send this invite to your device"
-							data-toggle="modal" data-target="#qr-modal">
-								<img src="{static}/qr-logo.png" class="align-middle h-50 mt-1" style="display:inline" >
-								Scan with mobile device
-						</button>
-					</a>
+					<button id="qr-modal-show" class="mt-2 d-block btn btn-secondary" title="Send this invite to your device"
+						data-toggle="modal" data-target="#qr-modal">
+							<img src="{static}/qr-logo.png" alt="QR code icon" class="align-middle h-50 mt-1" style="display:inline" >
+							Scan with mobile device
+					</button>
 				</div>
 			
 				{inviter?<p>You have been invited to chat on {site_name} using XMPP,
@@ -72,10 +70,8 @@
 							</a>
 						}
 						{item.text&
-							<a href="{item.url}" {item.target&target="{item.target}"} rel="noopener">
-								<button class="btn btn-primary">
-									{item.text}
-								</button>
+							<a href="{item.url}" {item.target&target="{item.target}"} class="btn btn-primary" rel="noopener">
+								{item.text}
 							</a>
 						}
 					}
@@ -88,7 +84,7 @@
 				<p>Installed ok? Great! <strong>Click or tap the button below</strong> to accept your invite and continue with your account setup:</p>
 
 				<div>
-					<a href="{uri}" id="uri-cta"><button class="btn btn-primary ml-5 mt-1 mb-3">Accept invite using {app.name}</button></a><br/>
+					<a href="{uri}" id="uri-cta" class="btn btn-primary ml-5 mt-1 mb-3">Accept invite using {app.name}</a><br/>
 				</div>
 
 				<p>After clicking the button you will be taken to {app.name} to finish setting up your new {site_name} account.</p>
@@ -97,31 +93,32 @@
 	</div>
 
 	<div class="modal" tabindex="-1" role="dialog" id="qr-modal">
-	  <div class="modal-dialog" role="document">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h5 class="modal-title">Scan invite code</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
-	      </div>
-	      <div class="modal-body">
-	        <p>You can transfer this invite to your mobile device by scanning a code with your camera.</p>
-		<div id="qr-info-url" class="tab-pane show active">
-			<p>Use a <em>QR code</em> scanner on your mobile device to scan the code below:</p>
-		<div id="qr-invite-page" class="w-50 p-1 mx-auto"></div>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-	      </div>
-	    </div>
-	  </div>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Scan invite code</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>You can transfer this invite to your mobile device by scanning a code with your camera.</p>
+					<div id="qr-info-url" class="tab-pane show active">
+						<p>Use a <em>QR code</em> scanner on your mobile device to scan the code below:</p>
+						<div id="qr-invite-page" class="w-50 p-1 mx-auto"></div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<script src="/share/jquery/jquery.min.js"></script>
 	<script src="/share/bootstrap4/js/bootstrap.min.js"></script>
 	<script src="{static}/qrcode.min.js"></script>
-	<script type="text/javascript">
+	<script>
 		$(function () {
 			// If QR lib loaded ok, show QR button on desktop devices
 			if(window.QRCode) {
