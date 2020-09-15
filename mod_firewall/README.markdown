@@ -158,6 +158,10 @@ Fetches a list from a HTTP or HTTPS URL. The following options are accepted:
   ttl       Seconds to cache the list for. After expiry, it will be refetched. Default 3600 (1 hour).
   pattern   Optional pattern used to extract list entries from the response. Default is to treat each line as a single item.
   hash      Optional hash to be applied to items before looking them up in the list, e.g. sha1 or sha256.
+  checkcert Whether to verify HTTPS certificates. May be "always", "never" or "when-sni". Default "when-sni".
+
+The "when-sni" default disables certificate verification when Prosody's HTTP client API doesn't support SNI,
+as in Prosody 0.11.6 and earlier.
 
 #### CHECK LIST
 

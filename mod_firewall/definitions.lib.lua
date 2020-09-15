@@ -104,8 +104,17 @@ local list_backends = {
 			local etag;
 			local failure_count = 0;
 			local retry_intervals = { 60, 120, 300 };
+			-- By default only check the certificate if net.http supports SNI
+			local sni_supported = http.feature and http.features.sni;
+			local insecure = false;
+			if opts.checkcert == "never" then
+				insecure = true;
+			elseif (opts.checkcert == nil or opts.checkcert == "when-sni") and not sni_supported then
+				insecure = false;
+			end
 			local function update_list()
 				http.request(url, {
+					insecure = insecure;
 					headers = {
 						["If-None-Match"] = etag;
 					};
