@@ -147,10 +147,17 @@
 					if(platform.os.family.startsWith("Windows")) {
 						platform_friendly = "Windows";
 						platform_classname = "windows";
+					} else {
+						platform_friendly = platform.os.family;
+						platform_classname = platform_friendly.toLowerCase();
 					}
 				}
 
 				if(platform_friendly && platform_classname) {
+					if($('.client-card .client-platform-badge-'+platform_classname).length == 0) {
+						// No clients recognised for this platform, do nothing
+						return;
+					}
 					// Hide clients not for this platform
 					$('.client-card.app-platform-'+platform_classname).addClass("supported-platform");
 					$('.client-card').not(".supported-platform").hide();
