@@ -15,7 +15,7 @@
 	<meta name="theme-color" content="#fbd308">
 </head>
 <body>
-	<div id="background" class="fixed-top overflow-hidden" aria-role="none presentation"></div>
+	<div id="background" class="fixed-top overflow-hidden"></div>
 	<div id="form" class="container col-md-10 col-md-offset-1 col-sm-8 col-sm-offset-2 col-lg-10 col-lg-offset-1 mt-2 mt-md-5">
 		<div class="card rounded-lg shadow">
 			<h1 class="card-header rounded-lg rounded-lg">
@@ -28,7 +28,7 @@
 					your camera.
 					<button id="qr-modal-show" class="mt-2 d-block btn btn-info" title="Send this invite to your device"
 						data-toggle="modal" data-target="#qr-modal">
-							<img src="{static}/qr-logo.png" class="align-middle h-50 mt-1" style="display:inline" >
+							<img src="{static}/qr-logo.png" alt="QR code icon" class="align-middle h-50 mt-1" style="display:inline" >
 							Scan with mobile device
 					</button>
 				</div>
@@ -115,7 +115,7 @@
 	<script src="/share/bootstrap4/js/bootstrap.min.js"></script>
 	<script src="{static}/qrcode.min.js"></script>
 	<script src="{static}/platform.min.js"></script>
-	<script type="text/javascript">
+	<script>
 		$(function () {
 			// If QR lib loaded ok, show QR button on desktop devices
 			if(window.QRCode) {
