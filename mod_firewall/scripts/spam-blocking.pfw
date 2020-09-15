@@ -125,7 +125,7 @@ PASS.
 
 # We don't want to receive presence from random strangers,
 # but still allow subscription requests
-NOT TYPE: subscribe
+NOT TYPE: subscribe|subscribed
 DROP.
 
 # This chain can be used by other scripts
