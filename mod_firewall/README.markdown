@@ -121,6 +121,44 @@ a list of malware URLs or simple words that you want to filter messages on.
   file         %LIST spammers: file:/etc/spammers.txt
   http         %LIST spammers: http://example.com/spammers.txt
 
+#### List types
+##### memory
+
+```
+%LIST name: memory (limit: number)
+```
+
+A memory-only list, with an optional limit. Supports addition and removal of items by scripts.
+
+If a limit is provided, the oldest item will be discarded to make room for a new item if the
+list is full. The limit is useful to prevent infinite memory growth on busy servers.
+
+##### file
+
+```
+%LIST name: file:/path/to/file (missing: string)
+```
+
+Reads a list from a file. The list can be added to and removed from by scripts, but
+these changes do not persist between restarts.
+
+If the file is missing, an error will be raised. The optional 'missing' parameter can be set
+to 'ignore' (e.g. `(missing: ignore)`) to ignore a missing file.
+
+##### http
+
+```
+%LIST name: http://example.com/ (ttl: number, pattern: pat, hash: sha1, checkcerts: when-sni)
+```
+
+Fetches a list from a HTTP or HTTPS URL. The following options are accepted:
+
+  Option    Description
+  -------   -----------
+  ttl       Seconds to cache the list for. After expiry, it will be refetched. Default 3600 (1 hour).
+  pattern   Optional pattern used to extract list entries from the response. Default is to treat each line as a single item.
+  hash      Optional hash to be applied to items before looking them up in the list, e.g. sha1 or sha256.
+
 #### CHECK LIST
 
 Checks whether a simple expression is found in a given list.
