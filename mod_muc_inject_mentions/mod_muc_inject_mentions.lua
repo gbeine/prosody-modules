@@ -71,10 +71,12 @@ local function has_nick_suffix(body, last)
     -- There are no configured suffixes
     if not suffixes or #suffixes < 1 then return false end
 
-    -- Suffix must have a space after it
-    -- or be the last character of the body
+    -- Suffix must have a space after it,
+    -- be the last character of the body
+    -- or be the last character before a new line
     if body:sub(last + 2, last + 2) ~= "" and
-        body:sub(last + 2, last + 2) ~= " "
+        body:sub(last + 2, last + 2) ~= " " and
+        body:sub(last + 2, last + 2) ~= "\n"
     then
         return false
     end
