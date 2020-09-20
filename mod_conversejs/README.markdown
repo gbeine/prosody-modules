@@ -91,11 +91,21 @@ Note that the following options are automatically provided, and
 `mod_bosh` and/or `mod_websocket` are automatically enabled if available
 and the respective endpoint is included in the generated options.
 
-Loading resources
------------------
+## Loading resources
 
-By default the module will load the main script and CSS from cdn.conversejs.org. For privacy or performance
-reasons you may want to load the scripts from somewhere else, simply use the conversejs_cdn option:
+By default the module will load the main script and CSS from
+cdn.conversejs.org. For privacy or performance reasons you may want to
+load the scripts from somewhere else.
+
+To use a local distribution or build of Converse.js set
+conversejs_resources to the local path of "dist" directory:
+
+``` {.lua}
+conversejs_resources = "/usr/src/conversejs/dist";
+```
+
+To use a different web server or CDN simply use the conversejs_cdn
+option:
 
 ``` {.lua}
 conversejs_cdn = "https://cdn.example.com"

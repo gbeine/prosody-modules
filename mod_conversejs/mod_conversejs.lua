@@ -23,6 +23,25 @@ local cdn_url = module:get_option_string("conversejs_cdn", "https://cdn.converse
 
 local version = module:get_option_string("conversejs_version", "");
 if version ~= "" then version = "/" .. version end
+
+local serve_dist = nil;
+local resources = module:get_option_path("conversejs_resources");
+if resources then
+	local serve;
+	if not pcall(function()
+		-- Prosody >= trunk / 0.12
+		local http_files = require "net.http.files";
+		serve = http_files.serve;
+	end) then
+		-- Prosody <= 0.11
+		serve = module:depends "http_files".serve;
+	end
+	local mime_map = module:shared("/*/http_files/mime").types or {css = "text/css"; js = "application/javascript"};
+	serve_dist = serve({path = resources; mime_map = mime_map});
+
+	cdn_url = module:http_url();
+end
+
 local js_url = module:get_option_string("conversejs_script", cdn_url..version.."/dist/converse.min.js");
 local css_url = module:get_option_string("conversejs_css", cdn_url..version.."/dist/converse.min.css");
 
@@ -112,6 +131,7 @@ module:provides("http", {
 			event.response.headers.content_type = "application/javascript";
 			return js_template:format(json_encode(converse_options));
 		end;
+		["GET /dist/*"] = serve_dist;
 	}
 });
 
