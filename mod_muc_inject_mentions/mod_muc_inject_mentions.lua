@@ -52,7 +52,7 @@ local function has_nick_prefix(body, first)
     end
 
     local preffix = body:sub(first - 1, first - 1)
-    for i, _preffix in ipairs(prefixes) do
+    for _, _preffix in ipairs(prefixes) do
         if preffix == _preffix then
             return true
         end
@@ -78,7 +78,7 @@ local function has_nick_suffix(body, last)
     end
 
     local suffix = body:sub(last+1, last+1)
-    for i, _suffix in ipairs(suffixes) do
+    for _, _suffix in ipairs(suffixes) do
         if suffix == _suffix then
             return true
         end
