@@ -1,6 +1,6 @@
 module:depends("muc");
 
-local jid_split = require "util.jid".split;
+local jid_resource = require "util.jid".resource;
 
 local prefixes = module:get_option("muc_inject_mentions_prefixes", nil)
 local suffixes = module:get_option("muc_inject_mentions_suffixes", nil)
@@ -92,7 +92,7 @@ local function search_mentions(room, stanza)
     local mentions = {}
 
     for _, occupant in pairs(room._occupants) do
-        local node, host, nick = jid_split(occupant.nick);
+        local nick = jid_resource(occupant.nick);
         -- Check for multiple mentions to the same nickname in a message
         -- Hey @nick remember to... Ah, also @nick please let me know if...
         local matches = {}
