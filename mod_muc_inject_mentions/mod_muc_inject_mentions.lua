@@ -119,9 +119,9 @@ local function search_mentions(room, stanza)
             if first == 1 and last == #body then
                 table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
 
-            -- Nickname between spaces
-            elseif body:sub(first - 1, first - 1) == " " and
-                body:sub(last + 1, last + 1) == " "
+            -- Nickname between spaces or new lines
+            elseif body:sub(first - 1, first - 1) == " " or body:sub(first - 1, first - 1) == "\n" and
+                body:sub(last + 1, last + 1) == " " or body:sub(last + 1, last + 1) == "\n"
             then
                 table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
             else
