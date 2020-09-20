@@ -43,10 +43,12 @@ local function has_nick_prefix(body, first)
     -- There are no configured prefixes
     if not prefixes or #prefixes < 1 then return false end
 
-    -- Preffix must have a space before it
-    -- or be the first character of the body
+    -- Preffix must have a space before it,
+    -- be the first character of the body
+    -- or be the first character after a new line
     if body:sub(first - 2, first - 2) ~= "" and
-        body:sub(first - 2, first - 2) ~= " "
+        body:sub(first - 2, first - 2) ~= " " and
+        body:sub(first - 2, first - 2) ~= "\n"
     then
         return false
     end
@@ -131,7 +133,9 @@ local function search_mentions(room, stanza)
 
                 -- @nickname ...
                 elseif has_preffix and not has_suffix then
-                    if body:sub(last + 1, last + 1) == " " then
+                    if body:sub(last + 1, last + 1) == " " or
+                        body:sub(last + 1, last + 1) == "\n"
+                    then
                         table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
                     end
 
