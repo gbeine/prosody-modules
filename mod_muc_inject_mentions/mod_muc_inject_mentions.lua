@@ -96,7 +96,8 @@ local function search_mentions(room, stanza)
         -- Check for multiple mentions to the same nickname in a message
         -- Hey @nick remember to... Ah, also @nick please let me know if...
         local matches = {}
-        local _first, _last = 0, 0
+        local _first
+        local _last = 0
         while true do
             -- Use plain search as nick could contain
             -- characters used in Lua patterns
