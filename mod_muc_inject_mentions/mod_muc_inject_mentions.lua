@@ -143,7 +143,9 @@ local function search_mentions(room, stanza)
 
                 -- nickname: ...
                 elseif not has_preffix and has_suffix then
-                    if body:sub(first - 1, first - 1) == " " then
+                    if body:sub(first - 1, first - 1) == " " or
+                        body:sub(first - 1, first - 1) == "\n"
+                    then
                         table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
                     end
                 end
