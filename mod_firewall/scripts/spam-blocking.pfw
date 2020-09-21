@@ -22,7 +22,7 @@
 #   PASS stanzas that are not spam and jump to ::user/spam_reject
 #   for stanzas that are considered spam.
 #
-# ::user/spam_check_message_content
+# ::user/spam_check_message_content_custom
 #   Apply additional rules to messages that may be spam, based on
 #   message content rules. These may contain more intensive rules,
 #   so are executed after all other checks. Rules should jump to
@@ -102,9 +102,11 @@ PASS.
 NOT TYPE: chat
 JUMP CHAIN=user/spam_reject
 
+JUMP CHAIN=user/spam_check_message_content
+
 # This chain can be used by other scripts
 # and modules that analyze message content
-JUMP CHAIN=user/spam_check_message_content
+JUMP CHAIN=user/spam_check_message_content_custom
 
 ##################################################################
 
