@@ -31,7 +31,7 @@
 # ::user/spam_check_presence_custom
 #   Apply additional rules to presence that may be spam.
 #
-# ::user/spam_check_subscription_request
+# ::user/spam_check_subscription_request_custom
 #   Apply additional rules to subscription requests.
 #
 # ::user/spam_handle_unknown_custom
@@ -133,6 +133,8 @@ DROP.
 # This chain can be used by other scripts
 # and modules to filter subscription requests
 JUMP CHAIN=user/spam_check_subscription_request
+
+JUMP CHAIN=user/spam_check_subscription_request_custom
 
 ##################################################################
 
