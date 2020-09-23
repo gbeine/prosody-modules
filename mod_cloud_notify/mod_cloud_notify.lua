@@ -257,7 +257,7 @@ local function is_important(stanza)
 		local stanza_direction = "in";
 		local carbon;
 		local st_type;
-		-- support carbon copied message stanzas having an arbitrary message-namespace or no message-namespace at all
+		-- support carbon copied message stanzas
 		if not carbon then carbon = stanza:find("{urn:xmpp:carbons:2}/{urn:xmpp:forward:0}/{jabber:client}message"); end
 		stanza_direction = carbon and stanza:child_with_name("sent") and "out" or "in";
 		if carbon then stanza = carbon; end
