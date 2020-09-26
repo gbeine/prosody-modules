@@ -68,6 +68,12 @@ One or more rule files can be specified in the configuration using:
 If multiple files are specified and they both add rules to the same chains,
 each file's rules will be processed in order, but the order of files is undefined.
 
+Reloading Prosody's configuration also reloads firewall rules.
+
+Make sure that `firewall_scripts` is in the global section of the configuration file
+and not below a virtual host or a component - unless you want per-vhost
+firewall rules.
+
 Conditions
 ----------
 
@@ -587,8 +593,9 @@ It is possible to have multiple marks on an origin at any given time.
   --------------- ------------------------------------------------------------------------------------------------------------------------
   `LOG=message`   Logs the given message to Prosody's log file. Optionally prefix it with a log level in square brackets, e.g. `[debug]`
 
-You can include expressions in log messages, using `$(...)` syntax. For example, to log the stanza that matched the rule, you can use $(stanza),
-or to log just the top tag of the stanza, use $(stanza:top_tag()).
+You can include expressions in log messages, using `$(...)` syntax. For example, to log the stanza that matched the rule, you can use `$(stanza)`,
+or to log just the top tag of the stanza, use `$(stanza:top_tag())`.
+To fetch the sender JID, use `$(stanza.attr.from)`.
 
 Example:
 
