@@ -92,6 +92,7 @@ local function get_converse_options()
 		domain_placeholder = module.host;
 		allow_registration = allow_registration;
 		registration_domain = allow_registration and module.host or nil;
+		assets_path = cdn_url..version.."/dist/";
 		view_mode = "fullscreen";
 	};
 
