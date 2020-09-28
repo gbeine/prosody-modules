@@ -6,21 +6,10 @@ local prefixes = module:get_option("muc_inject_mentions_prefixes", nil)
 local suffixes = module:get_option("muc_inject_mentions_suffixes", nil)
 local enabled_rooms = module:get_option("muc_inject_mentions_enabled_rooms", nil)
 local disabled_rooms = module:get_option("muc_inject_mentions_disabled_rooms", nil)
+local mention_delimiters = module:get_option_set("muc_inject_mentions_mention_delimiters",  {" ", "", "\n"})
+
 
 local reference_xmlns = "urn:xmpp:reference:0"
-
-
-local mention_delimiters = {" ", "", "\n"}
-
-local function in_list(value, list)
-    for _, v in ipairs(list) do
-        if v == value then
-            return true
-        end
-    end
-    return false
-end
-
 
 local function is_room_eligible(jid)
     if not enabled_rooms and not disabled_rooms then
@@ -55,7 +44,7 @@ local function has_nick_prefix(body, first)
     -- Preffix must have a space before it,
     -- be the first character of the body
     -- or be the first character after a new line
-    if not in_list(body:sub(first - 2, first - 2), mention_delimiters) then
+    if not mention_delimiters:contains(body:sub(first - 2, first - 2)) then
         return false
     end
 
@@ -76,7 +65,7 @@ local function has_nick_suffix(body, last)
     -- Suffix must have a space after it,
     -- be the last character of the body
     -- or be the last character before a new line
-    if not in_list(body:sub(last + 2, last + 2), mention_delimiters) then
+    if not mention_delimiters:contains(body:sub(last + 2, last + 2)) then
         return false
     end
 
@@ -115,8 +104,8 @@ local function search_mentions(room, stanza)
             local first, last = match.first, match.last
 
             -- Body only contains nickname or is between spaces, new lines or at the end/start of the body
-            if in_list(body:sub(first - 1, first - 1), mention_delimiters) and
-                in_list(body:sub(last + 1, last + 1), mention_delimiters)
+            if mention_delimiters:contains(body:sub(first - 1, first - 1)) and
+                mention_delimiters:contains(body:sub(last + 1, last + 1))
             then
                 table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
             else
@@ -130,13 +119,13 @@ local function search_mentions(room, stanza)
 
                 -- @nickname ...
                 elseif has_preffix and not has_suffix then
-                    if in_list(body:sub(last + 1, last + 1), mention_delimiters) then
+                    if mention_delimiters:contains(body:sub(last + 1, last + 1)) then
                         table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
                     end
 
                 -- nickname: ...
                 elseif not has_preffix and has_suffix then
-                    if in_list(body:sub(first - 1, first - 1), mention_delimiters) then
+                    if mention_delimiters:contains(body:sub(first - 1, first - 1)) then
                         table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
                     end
                 end
