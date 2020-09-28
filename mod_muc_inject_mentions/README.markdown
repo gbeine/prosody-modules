@@ -51,6 +51,18 @@ Only one of the following settings must be set.
 
 If none or both are found, all rooms in the muc component will have mentions enabled.
 
+
+It is also possible to modify how this module detects mentions.
+In short, the module will detect if a mention is actually a mention
+if the nickname (with or without affixes) is between spaces, new lines, or at the beginning/end of the message.
+This can be changed using:
+
+```
+-- muc_inject_mentions_mention_delimiters =  {" ", "", "\n"}
+```
+Generally speaking and unless the use-case is very specific, there should be no need to modify the defaults of this setting.
+
+
 # Example stanzas
 
 Alice sends the following message
