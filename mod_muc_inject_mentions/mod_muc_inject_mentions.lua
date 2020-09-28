@@ -9,6 +9,19 @@ local disabled_rooms = module:get_option("muc_inject_mentions_disabled_rooms", n
 
 local reference_xmlns = "urn:xmpp:reference:0"
 
+
+local mention_delimiters = {" ", "", "\n"}
+
+local function in_list(value, list)
+    for _, v in ipairs(list) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
+
 local function is_room_eligible(jid)
     if not enabled_rooms and not disabled_rooms then
         return true;
@@ -36,20 +49,13 @@ local function is_room_eligible(jid)
 end
 
 local function has_nick_prefix(body, first)
-    -- There is no prefix
-    -- but mention could still be valid
-    if first == 1 then return true end
-
     -- There are no configured prefixes
     if not prefixes or #prefixes < 1 then return false end
 
     -- Preffix must have a space before it,
     -- be the first character of the body
     -- or be the first character after a new line
-    if body:sub(first - 2, first - 2) ~= "" and
-        body:sub(first - 2, first - 2) ~= " " and
-        body:sub(first - 2, first - 2) ~= "\n"
-    then
+    if not in_list(body:sub(first - 2, first - 2), mention_delimiters) then
         return false
     end
 
@@ -64,20 +70,13 @@ local function has_nick_prefix(body, first)
 end
 
 local function has_nick_suffix(body, last)
-    -- There is no suffix
-    -- but mention could still be valid
-    if last == #body then return true end
-
     -- There are no configured suffixes
     if not suffixes or #suffixes < 1 then return false end
 
     -- Suffix must have a space after it,
     -- be the last character of the body
     -- or be the last character before a new line
-    if body:sub(last + 2, last + 2) ~= "" and
-        body:sub(last + 2, last + 2) ~= " " and
-        body:sub(last + 2, last + 2) ~= "\n"
-    then
+    if not in_list(body:sub(last + 2, last + 2), mention_delimiters) then
         return false
     end
 
@@ -115,13 +114,9 @@ local function search_mentions(room, stanza)
             local bare_jid = occupant.bare_jid
             local first, last = match.first, match.last
 
-            -- Body only contains nickname
-            if first == 1 and last == #body then
-                table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
-
-            -- Nickname between spaces or new lines
-            elseif body:sub(first - 1, first - 1) == " " or body:sub(first - 1, first - 1) == "\n" and
-                body:sub(last + 1, last + 1) == " " or body:sub(last + 1, last + 1) == "\n"
+            -- Body only contains nickname or is between spaces, new lines or at the end/start of the body
+            if in_list(body:sub(first - 1, first - 1), mention_delimiters) and
+                in_list(body:sub(last + 1, last + 1), mention_delimiters)
             then
                 table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
             else
@@ -135,17 +130,13 @@ local function search_mentions(room, stanza)
 
                 -- @nickname ...
                 elseif has_preffix and not has_suffix then
-                    if body:sub(last + 1, last + 1) == " " or
-                        body:sub(last + 1, last + 1) == "\n"
-                    then
+                    if in_list(body:sub(last + 1, last + 1), mention_delimiters) then
                         table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
                     end
 
                 -- nickname: ...
                 elseif not has_preffix and has_suffix then
-                    if body:sub(first - 1, first - 1) == " " or
-                        body:sub(first - 1, first - 1) == "\n"
-                    then
+                    if in_list(body:sub(first - 1, first - 1), mention_delimiters) then
                         table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
                     end
                 end
