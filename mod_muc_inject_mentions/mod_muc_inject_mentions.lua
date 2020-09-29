@@ -7,7 +7,7 @@ local suffixes = module:get_option("muc_inject_mentions_suffixes", nil)
 local enabled_rooms = module:get_option("muc_inject_mentions_enabled_rooms", nil)
 local disabled_rooms = module:get_option("muc_inject_mentions_disabled_rooms", nil)
 local mention_delimiters = module:get_option_set("muc_inject_mentions_mention_delimiters",  {" ", "", "\n"})
-local append_mentions = module:get_option("muc_inject_mentions_append_mentions", true)
+local append_mentions = module:get_option("muc_inject_mentions_append_mentions", false)
 
 
 local reference_xmlns = "urn:xmpp:reference:0"
