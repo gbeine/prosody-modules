@@ -52,6 +52,16 @@ Only one of the following settings must be set.
 If none or both are found, all rooms in the muc component will have mentions enabled.
 
 
+By default, if a message contains at least one mention,
+the module does not do anything, as it believes all mentions were already sent by the client.
+In cases where it is desired the module to inspect the message and try to find extra mentions
+that could be missing, the following setting can be added:
+
+```
+muc_inject_mentions_append_mentions = true
+```
+
+
 It is also possible to modify how this module detects mentions.
 In short, the module will detect if a mention is actually a mention
 if the nickname (with or without affixes) is between spaces, new lines, or at the beginning/end of the message.

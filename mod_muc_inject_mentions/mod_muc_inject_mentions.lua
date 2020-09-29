@@ -7,9 +7,26 @@ local suffixes = module:get_option("muc_inject_mentions_suffixes", nil)
 local enabled_rooms = module:get_option("muc_inject_mentions_enabled_rooms", nil)
 local disabled_rooms = module:get_option("muc_inject_mentions_disabled_rooms", nil)
 local mention_delimiters = module:get_option_set("muc_inject_mentions_mention_delimiters",  {" ", "", "\n"})
+local append_mentions = module:get_option("muc_inject_mentions_append_mentions", true)
 
 
 local reference_xmlns = "urn:xmpp:reference:0"
+
+
+local function get_client_mentions(stanza)
+    local has_mentions = false
+    local client_mentions = {}
+
+    for element in stanza:childtags("reference", reference_xmlns) do
+        if element.attr.type == "mention" then
+            local key = tonumber(element.attr.begin) + 1 -- count starts at 0
+            client_mentions[key] = {bare_jid=element.attr.uri, first=element.attr.begin, last=element.attr["end"]}
+            has_mentions = true
+        end
+    end
+
+    return has_mentions, client_mentions
+end
 
 local function is_room_eligible(jid)
     if not enabled_rooms and not disabled_rooms then
@@ -79,8 +96,7 @@ local function has_nick_suffix(body, last)
     return false
 end
 
-local function search_mentions(room, stanza)
-    local body = stanza:get_child("body"):get_text();
+local function search_mentions(room, body, client_mentions)
     local mentions = {}
 
     for _, occupant in pairs(room._occupants) do
@@ -102,31 +118,33 @@ local function search_mentions(room, stanza)
         for _, match in ipairs(matches) do
             local bare_jid = occupant.bare_jid
             local first, last = match.first, match.last
+            -- Only append new mentions in case the client already sent some
+            if not client_mentions[first] then
+                -- Body only contains nickname or is between spaces, new lines or at the end/start of the body
+                if mention_delimiters:contains(body:sub(first - 1, first - 1)) and
+                    mention_delimiters:contains(body:sub(last + 1, last + 1))
+                then
+                    mentions[first] = {bare_jid=bare_jid, first=first, last=last}
+                else
+                    -- Check if occupant is mentioned using affixes
+                    local has_preffix = has_nick_prefix(body, first)
+                    local has_suffix = has_nick_suffix(body, last)
 
-            -- Body only contains nickname or is between spaces, new lines or at the end/start of the body
-            if mention_delimiters:contains(body:sub(first - 1, first - 1)) and
-                mention_delimiters:contains(body:sub(last + 1, last + 1))
-            then
-                table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
-            else
-                -- Check if occupant is mentioned using affixes
-                local has_preffix = has_nick_prefix(body, first)
-                local has_suffix = has_nick_suffix(body, last)
+                    -- @nickname: ...
+                    if has_preffix and has_suffix then
+                        mentions[first] = {bare_jid=bare_jid, first=first, last=last}
 
-                -- @nickname: ...
-                if has_preffix and has_suffix then
-                    table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
+                    -- @nickname ...
+                    elseif has_preffix and not has_suffix then
+                        if mention_delimiters:contains(body:sub(last + 1, last + 1)) then
+                            mentions[first] = {bare_jid=bare_jid, first=first, last=last}
+                        end
 
-                -- @nickname ...
-                elseif has_preffix and not has_suffix then
-                    if mention_delimiters:contains(body:sub(last + 1, last + 1)) then
-                        table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
-                    end
-
-                -- nickname: ...
-                elseif not has_preffix and has_suffix then
-                    if mention_delimiters:contains(body:sub(first - 1, first - 1)) then
-                        table.insert(mentions, {bare_jid=bare_jid, first=first, last=last})
+                    -- nickname: ...
+                    elseif not has_preffix and has_suffix then
+                        if mention_delimiters:contains(body:sub(first - 1, first - 1)) then
+                            mentions[first] = {bare_jid=bare_jid, first=first, last=last}
+                        end
                     end
                 end
             end
@@ -138,14 +156,20 @@ end
 
 local function muc_inject_mentions(event)
     local room, stanza = event.room, event.stanza;
+    local body = stanza:get_child("body")
+
+    if not body then return; end
+
     -- Inject mentions only if the room is configured for them
     if not is_room_eligible(room.jid) then return; end
-    -- Only act on messages that do not include references.
-    -- If references are found, it is assumed the client has mentions support
-    if stanza:get_child("reference", reference_xmlns) then return; end
 
-    local mentions = search_mentions(room, stanza)
-    for _, mention in ipairs(mentions) do
+    -- Only act on messages that do not include mentions
+    -- unless configuration states otherwise.
+    local has_mentions, client_mentions = get_client_mentions(stanza)
+    if has_mentions and not append_mentions then return; end
+
+    local mentions = search_mentions(room, body:get_text(), client_mentions)
+    for _, mention in pairs(mentions) do
         -- https://xmpp.org/extensions/xep-0372.html#usecase_mention
         stanza:tag(
             "reference", {
