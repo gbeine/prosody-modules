@@ -1,6 +1,7 @@
 module:depends("muc");
 
 local jid_resource = require "util.jid".resource;
+local st = require "util.stanza";
 
 local prefixes = module:get_option("muc_inject_mentions_prefixes", nil)
 local suffixes = module:get_option("muc_inject_mentions_suffixes", nil)
@@ -8,10 +9,21 @@ local enabled_rooms = module:get_option("muc_inject_mentions_enabled_rooms", nil
 local disabled_rooms = module:get_option("muc_inject_mentions_disabled_rooms", nil)
 local mention_delimiters = module:get_option_set("muc_inject_mentions_mention_delimiters",  {" ", "", "\n"})
 local append_mentions = module:get_option("muc_inject_mentions_append_mentions", false)
+local strip_out_prefixes = module:get_option("muc_inject_mentions_strip_out_prefixes", false)
 
 
 local reference_xmlns = "urn:xmpp:reference:0"
 
+local function add_mention(mentions, bare_jid, first, last, prefix_indices, has_prefix)
+    if strip_out_prefixes then
+        if has_prefix then
+            table.insert(prefix_indices, first-1)
+        end
+        first = first - #prefix_indices
+        last = last - #prefix_indices
+    end
+    mentions[first] = {bare_jid=bare_jid, first=first, last=last}
+end
 
 local function get_client_mentions(stanza)
     local has_mentions = false
@@ -58,16 +70,16 @@ local function has_nick_prefix(body, first)
     -- There are no configured prefixes
     if not prefixes or #prefixes < 1 then return false end
 
-    -- Preffix must have a space before it,
+    -- Prefix must have a space before it,
     -- be the first character of the body
     -- or be the first character after a new line
     if not mention_delimiters:contains(body:sub(first - 2, first - 2)) then
         return false
     end
 
-    local preffix = body:sub(first - 1, first - 1)
-    for _, _preffix in ipairs(prefixes) do
-        if preffix == _preffix then
+    local prefix = body:sub(first - 1, first - 1)
+    for _, _prefix in ipairs(prefixes) do
+        if prefix == _prefix then
             return true
         end
     end
@@ -97,7 +109,7 @@ local function has_nick_suffix(body, last)
 end
 
 local function search_mentions(room, body, client_mentions)
-    local mentions = {}
+    local mentions, prefix_indices = {}, {}
 
     for _, occupant in pairs(room._occupants) do
         local nick = jid_resource(occupant.nick);
@@ -124,26 +136,26 @@ local function search_mentions(room, body, client_mentions)
                 if mention_delimiters:contains(body:sub(first - 1, first - 1)) and
                     mention_delimiters:contains(body:sub(last + 1, last + 1))
                 then
-                    mentions[first] = {bare_jid=bare_jid, first=first, last=last}
+                    add_mention(mentions, bare_jid, first, last, prefix_indices, false)
                 else
                     -- Check if occupant is mentioned using affixes
-                    local has_preffix = has_nick_prefix(body, first)
+                    local has_prefix = has_nick_prefix(body, first)
                     local has_suffix = has_nick_suffix(body, last)
 
                     -- @nickname: ...
-                    if has_preffix and has_suffix then
-                        mentions[first] = {bare_jid=bare_jid, first=first, last=last}
+                    if has_prefix and has_suffix then
+                        add_mention(mentions, bare_jid, first, last, prefix_indices, has_prefix)
 
                     -- @nickname ...
-                    elseif has_preffix and not has_suffix then
+                    elseif has_prefix and not has_suffix then
                         if mention_delimiters:contains(body:sub(last + 1, last + 1)) then
-                            mentions[first] = {bare_jid=bare_jid, first=first, last=last}
+                            add_mention(mentions, bare_jid, first, last, prefix_indices, has_prefix)
                         end
 
                     -- nickname: ...
-                    elseif not has_preffix and has_suffix then
+                    elseif not has_prefix and has_suffix then
                         if mention_delimiters:contains(body:sub(first - 1, first - 1)) then
-                            mentions[first] = {bare_jid=bare_jid, first=first, last=last}
+                            add_mention(mentions, bare_jid, first, last, prefix_indices, has_prefix)
                         end
                     end
                 end
@@ -151,7 +163,7 @@ local function search_mentions(room, body, client_mentions)
         end
     end
 
-    return mentions
+    return mentions, prefix_indices
 end
 
 local function muc_inject_mentions(event)
@@ -168,7 +180,8 @@ local function muc_inject_mentions(event)
     local has_mentions, client_mentions = get_client_mentions(stanza)
     if has_mentions and not append_mentions then return; end
 
-    local mentions = search_mentions(room, body:get_text(), client_mentions)
+    local body_text = body:get_text()
+    local mentions, prefix_indices = search_mentions(room, body_text, client_mentions)
     for _, mention in pairs(mentions) do
         -- https://xmpp.org/extensions/xep-0372.html#usecase_mention
         stanza:tag(
@@ -180,6 +193,28 @@ local function muc_inject_mentions(event)
                 uri="xmpp:" .. mention.bare_jid,
             }
         ):up()
+    end
+
+    if strip_out_prefixes then
+        local body_without_prefixes = ""
+        local from = 0
+        if #prefix_indices > 0 then
+            for _, prefix_index in ipairs(prefix_indices) do
+                body_without_prefixes = body_without_prefixes .. body_text:sub(from, prefix_index-1)
+                from = prefix_index + 1
+            end
+            body_without_prefixes = body_without_prefixes .. body_text:sub(from, #body_text)
+
+            -- Replace original body containing prefixes
+            stanza:maptags(
+                function(tag)
+                    if tag.name ~= "body" then
+                        return tag
+                    end
+                    return st.stanza("body"):text(body_without_prefixes)
+                end
+            )
+        end
     end
 end
 

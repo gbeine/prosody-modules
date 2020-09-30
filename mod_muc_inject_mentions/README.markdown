@@ -62,6 +62,15 @@ muc_inject_mentions_append_mentions = true
 ```
 
 
+Prefixes can be removed using:
+```
+muc_inject_mentions_strip_out_prefixes = true
+```
+Turning `Hey @someone` into `Hey someone`.
+Currently, prefixes can only be removed from module added mentions.
+If the client sends a mention type reference pointing to a nickname using a prefix (`Hey @someone`), the prefix will not be removed.
+
+
 It is also possible to modify how this module detects mentions.
 In short, the module will detect if a mention is actually a mention
 if the nickname (with or without affixes) is between spaces, new lines, or at the beginning/end of the message.
