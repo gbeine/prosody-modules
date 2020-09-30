@@ -26,7 +26,8 @@ http_auth_credentials = "prosody:secret-password"
 
 # Developers
 
-This 
+This section contains information for developers who wish to implement a
+HTTP service that Prosody can use for authentication.
 
 ## Protocol
 
