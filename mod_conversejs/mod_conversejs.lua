@@ -48,7 +48,7 @@ local css_url = module:get_option_string("conversejs_css", cdn_url..version.."/d
 local html_template;
 
 do
-	local template_filename = module:get_option_string(module.name .. "_html_template", "template.html");
+	local template_filename = module:get_option_string(module.name .. "_html_template", "templates/template.html");
 	local template_file, err = module:load_resource(template_filename);
 	if template_file then
 		html_template, err = template_file:read("*a");
@@ -65,7 +65,7 @@ end
 
 local js_template;
 do
-	local template_filename = module:get_option_string(module.name .. "_js_template", "template.js");
+	local template_filename = module:get_option_string(module.name .. "_js_template", "templates/template.js");
 	local template_file, err = module:load_resource(template_filename);
 	if template_file then
 		js_template, err = template_file:read("*a");
