@@ -5,6 +5,10 @@ depends:
 provides:
 - http
 title: 'mod\_conversejs'
+rockspec:
+  build:
+    copy_directories:
+    - templates
 ---
 
 Introduction
