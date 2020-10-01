@@ -71,6 +71,20 @@ Currently, prefixes can only be removed from module added mentions.
 If the client sends a mention type reference pointing to a nickname using a prefix (`Hey @someone`), the prefix will not be removed.
 
 
+There are two lists where this module pulls the participants from.
+1. Online participants
+2. Participants with registered nicknames
+
+By default, the module will try to find mentions to online participants.
+Using:
+```
+muc_inject_mentions_reserved_nicks = true
+```
+Will try to find mentions to participants with registered nicknames.
+This is useful for setups where the nickname is reserved for all participants,
+allowing the module to catch mentions to participants that might not be online at the moment of sending the message.
+
+
 It is also possible to modify how this module detects mentions.
 In short, the module will detect if a mention is actually a mention
 if the nickname (with or without affixes) is between spaces, new lines, or at the beginning/end of the message.

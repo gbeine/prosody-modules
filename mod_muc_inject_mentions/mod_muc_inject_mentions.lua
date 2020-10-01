@@ -10,9 +10,37 @@ local disabled_rooms = module:get_option("muc_inject_mentions_disabled_rooms", n
 local mention_delimiters = module:get_option_set("muc_inject_mentions_mention_delimiters",  {" ", "", "\n"})
 local append_mentions = module:get_option("muc_inject_mentions_append_mentions", false)
 local strip_out_prefixes = module:get_option("muc_inject_mentions_strip_out_prefixes", false)
+local reserved_nicks = module:get_option("muc_inject_mentions_reserved_nicks", false)
 
 
 local reference_xmlns = "urn:xmpp:reference:0"
+
+local function get_participants(room)
+    if not reserved_nicks then
+        local occupants = room._occupants
+        local key, occupant = next(occupants)
+        return function ()
+            while occupant do -- luacheck: ignore
+                local nick = jid_resource(occupant.nick);
+                local bare_jid = occupant.bare_jid
+                key, occupant = next(occupants, key)
+                return bare_jid, nick
+            end
+        end
+    else
+        local generator = room:each_affiliation()
+        local jid, _, affiliation_data = generator(nil, nil)
+        return function ()
+           while jid do
+                local bare_jid, nick = jid, (affiliation_data or {})["reserved_nickname"]
+                jid, _, affiliation_data = generator(nil, bare_jid)
+                if nick then
+                    return bare_jid, nick
+                end
+           end
+        end
+    end
+end
 
 local function add_mention(mentions, bare_jid, first, last, prefix_indices, has_prefix)
     if strip_out_prefixes then
@@ -111,8 +139,7 @@ end
 local function search_mentions(room, body, client_mentions)
     local mentions, prefix_indices = {}, {}
 
-    for _, occupant in pairs(room._occupants) do
-        local nick = jid_resource(occupant.nick);
+    for bare_jid, nick in get_participants(room) do
         -- Check for multiple mentions to the same nickname in a message
         -- Hey @nick remember to... Ah, also @nick please let me know if...
         local matches = {}
@@ -128,7 +155,6 @@ local function search_mentions(room, body, client_mentions)
 
         -- Filter out intentional mentions from unintentional ones
         for _, match in ipairs(matches) do
-            local bare_jid = occupant.bare_jid
             local first, last = match.first, match.last
             -- Only append new mentions in case the client already sent some
             if not client_mentions[first] then
