@@ -2,6 +2,12 @@
 labels:
 - 'Stage-Alpha'
 summary: RESTful XMPP API
+rockspec:
+  build:
+    modules:
+      mod_rest.jsonmap: jsonmap.lib.lua
+    copy_directories:
+    - example
 ---
 
 # Introduction
