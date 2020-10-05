@@ -2,7 +2,15 @@
 labels:
 - 'Stage-Alpha'
 summary: 'A rule-based stanza filtering module'
-...
+rockspec:
+  build:
+    modules:
+      mod_firewall.actions: actions.lib.lua
+      mod_firewall.conditions: conditions.lib.lua
+      mod_firewall.definitions: definitions.lib.lua
+      mod_firewall.marks: marks.lib.lua
+      mod_firewall.test: test.lib.lua
+---
 
 ------------------------------------------------------------------------
 
