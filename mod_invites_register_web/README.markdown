@@ -37,6 +37,10 @@ download and configuration via mod_register_apps.
 There is no specific configuration for this module (though it uses the
 optional `site_name` to override the displayed site name.
 
+You may also set `webchat_url` to the URL of a web chat that will be linked
+to after successful registration. If not specified but mod_conversejs is loaded
+on the current host, it will default to the URL of that module.
+
 This module depends on mod_invites_page solely for the case where an invalid
 invite token is received - it will redirect to mod_invites_page so that an
 appropriate error can be served to the user.

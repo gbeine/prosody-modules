@@ -1,6 +1,7 @@
 local id = require "util.id";
 local http_formdecode = require "net.http".formdecode;
 local usermanager = require "core.usermanager";
+local modulemanager = require "core.modulemanager";
 local nodeprep = require "util.encodings".stringprep.nodeprep;
 local st = require "util.stanza";
 local url_escape = require "util.http".urlencode;
@@ -13,6 +14,14 @@ module:depends("register_apps");
 
 local site_name = module:get_option_string("site_name", module.host);
 local site_apps = module:shared("register_apps/apps");
+
+local webchat_url = module:get_option_string("webchat_url");
+
+-- If not provided, but mod_conversejs is loaded, default to that
+if not webchat_url and modulemanager.get_modules_for_host(module.host):contains("conversejs") then
+	local conversejs = module:depends("conversejs");
+	webchat_url = conversejs.module:http_url();
+end
 
 module:depends("http");
 
@@ -166,6 +175,7 @@ function handle_register_form(event)
 			domain = module.host;
 			password = password;
 			app = app_info;
+			webchat_url = webchat_url;
 		});
 	else
 		local err_id = id.short();
