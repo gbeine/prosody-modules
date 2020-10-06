@@ -113,21 +113,45 @@ end
 
 local site_apps = module:shared("apps");
 
-for k, v in pairs(site_apps) do
-	if v._source == module.name then
-		site_apps[k] = nil;
-	end
-end
-
-for _, app_info in ipairs(app_config) do
+local function add_app(app_info, source)
 	local app_id = app_info.id or app_info.name:gsub("%W+", "-"):lower();
 	if (not show_apps or show_apps:contains(app_id))
-	and not (hide_apps and hide_apps:contains(app_id)) then
+	and not (hide_apps and hide_apps:contains(app_id))
+	and not site_apps[app_id] then
 		app_info.id = app_id;
 		app_info.image = relurl(app_info.image);
 		site_apps[app_id] = app_info;
-		app_info._source = module.name;
+		app_info._source = source;
 		table.insert(site_apps, app_info);
+	end
+end
+
+local function remove_app(app_info)
+	local app_id = app_info.id or app_info.name:gsub("%W+", "-"):lower();
+	site_apps[app_id] = nil;
+end
+
+local function add_config_apps()
+	for _, app_info in ipairs(app_config) do
+		add_app(app_info, module.name);
+	end
+end
+
+local function module_app_added(event)
+	module:log("warn", "ADDING %s", event.item.name)
+	add_app(event.item, module.name);
+end
+
+local function module_app_removed(event)
+	remove_app(event.item);
+end
+
+-- Remove all apps added by this module
+local function remove_all_apps()
+	for k, v in pairs(site_apps) do
+		if v._source == module.name then
+			remove_app(k);
+		end
 	end
 end
 
@@ -144,3 +168,13 @@ module:provides("http", {
 		});
 	};
 });
+
+function module.load()
+	add_config_apps();
+	module:handle_items("site-app-provider", module_app_added, module_app_removed, true);
+end
+
+function module.unload()
+	remove_all_apps();
+end
+
