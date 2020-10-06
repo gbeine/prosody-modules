@@ -57,7 +57,7 @@ module:hook("iq-set/bare/" .. xmlns_fasten .. ":apply-to", function (event)
 	local affiliation = room:get_affiliation(actor);
 	local role = room:get_role(actor_nick) or room:get_default_role(affiliation);
 	if valid_roles[role or "none"] < valid_roles.moderator then
-		origin.send(st.error_reply(stanza, "auth", "forbidden", "Insufficient privileges"));
+		origin.send(st.error_reply(stanza, "auth", "forbidden", "You need a role of at least 'moderator'"));
 		return true;
 	end
 
