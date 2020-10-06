@@ -38,7 +38,7 @@ function serve_register_page(event)
 		return {
 			status_code = 303;
 			headers = {
-				["Location"] = invites.module:http_url().."?"..(event.request.url.query or "");
+				["Location"] = invites_page.module:http_url().."?"..(event.request.url.query or "");
 			};
 		};
 	end
