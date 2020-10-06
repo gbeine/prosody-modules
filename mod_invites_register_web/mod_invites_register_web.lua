@@ -8,7 +8,12 @@ local url_escape = require "util.http".urlencode;
 local render_html_template = require"util.interpolation".new("%b{}", st.xml_escape, {
 	urlescape = url_escape;
 });
-
+local render_url = require "util.interpolation".new("%b{}", url_escape, {
+	urlescape = url_escape;
+	noscheme = function (url)
+		return (url:gsub("^[^:]+:", ""));
+	end;
+});
 
 module:depends("register_apps");
 
@@ -157,6 +162,21 @@ function handle_register_form(event)
 
 		local success_template;
 		if app_info then
+			if app_info.login_link_format then
+				local redirect_url = render_url(app_info.login_link_format, {
+					site_name = site_name;
+					username = prepped_username;
+					domain = module.host;
+					password = password;
+					app = app_info;
+				});
+				return {
+					status_code = 303;
+					headers = {
+						["Location"] = redirect_url;
+					};
+				};
+			end
 			-- If recognised app, we serve a page that includes setup instructions
 			success_template = assert(module:load_resource("html/register_success_setup.html")):read("*a");
 		else
