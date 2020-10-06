@@ -3,6 +3,7 @@
 
 local json_encode = require"util.json".encode;
 local xml_escape = require "util.stanza".xml_escape;
+local urlencode = require "util.http".urlencode;
 local render = require "util.interpolation".new("%b{}", xml_escape, { json = json_encode });
 
 module:depends"http";
@@ -136,3 +137,21 @@ module:provides("http", {
 	}
 });
 
+module:provides("site-app", {
+	name = "Converse.js";
+	text = [[A free and open-source XMPP chat client in your browser]];
+	image = "assets/logos/converse-js.svg";
+	link = "https://conversejs.org/";
+	magic_link_format = "/register?t={invite.token}&c=converse-js";
+	login_link_format = module:http_url();
+	platforms = { "Web" };
+	download = {
+		buttons = {
+			{
+				text = "Open web chat";
+				url = module:http_url();
+			};
+		};
+	};
+
+});
