@@ -160,7 +160,7 @@
 					}
 					// Hide clients not for this platform
 					$('.client-card.app-platform-'+platform_classname).addClass("supported-platform");
-					$('.client-card').not(".supported-platform").hide();
+					$('.client-card').not(".supported-platform, .app-platform-web").hide();
 					$('.client-card .client-platform-badge')
 						.not(".client-platform-badge-"+platform_classname)
 							.addClass("badge-secondary")
