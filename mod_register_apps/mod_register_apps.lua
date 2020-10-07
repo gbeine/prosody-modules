@@ -68,6 +68,10 @@ local app_config = module:get_option("site_apps", {
 				};
 			};
 		};
+		setup = {
+			text = [[Launch Beagle IM, and select 'Yes' to add a new account. Click the '+'
+			         button under the empty account list and then enter your credentials.]];
+		};
 	};
 	{
 		name  = "Dino";
