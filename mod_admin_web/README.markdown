@@ -2,6 +2,15 @@
 labels:
 - 'Stage-Beta'
 summary: Web administration interface
+rockspec:
+  build:
+    platforms:
+      unix:
+        copy_directories:
+          - admin_web/www_files
+        type: command
+        build_command: sh admin_web/get_deps.sh
+        install_command: cp admin_web/mod_admin_web.lua $(LUADIR)
 ...
 
 Introduction
