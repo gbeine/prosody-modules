@@ -2,6 +2,10 @@
 labels:
 - 'Stage-Beta'
 summary: 'Manage list of compatible client apps'
+rockspec:
+  build:
+    copy_directories:
+    - assets
 ...
 
 Introduction
