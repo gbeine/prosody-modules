@@ -133,7 +133,7 @@ function module.add_host(module)
 	local path = module:get_directory() .. "/www_files";
 	if module.resource_path then
 		-- Available from trunk be73df6765b9 if installed via luarocks
-		path = module.resource_path .. "/admin_web/www_files";
+		path = module.resource_path .. "/www_files";
 	end
 	local serve_file = serve {
 		path = path;
