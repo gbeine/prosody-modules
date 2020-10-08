@@ -34,7 +34,7 @@ module:depends"http";
 
 local template;
 do
-	local template_filename = module:get_option_string(module.name .. "_template", module.name .. ".html");
+	local template_filename = module:get_option_string(module.name .. "_template", "res/" .. module.name .. ".html");
 	local template_file, err = module:load_resource(template_filename);
 	if template_file then
 		template, err = template_file:read("*a");
@@ -418,7 +418,7 @@ local function list_rooms(event)
 				jid = room.jid;
 				localpart = localpart;
 				href = get_link(localpart, default_view);
-				name = room:get_name();
+				name = room:get_name() or localpart;
 				lang = room.get_language and room:get_language();
 				description = room:get_description();
 			}, i + 1;

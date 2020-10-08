@@ -2,6 +2,10 @@
 labels:
 - 'Stage-Beta'
 summary: Provides a web interface to stored chatroom logs
+rockspec:
+  build:
+    copy_directories:
+      - res
 ...
 
 Introduction
