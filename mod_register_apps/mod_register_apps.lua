@@ -1,3 +1,4 @@
+-- luacheck: ignore 631
 module:depends("http");
 local http_files = module:depends("http_files");
 
