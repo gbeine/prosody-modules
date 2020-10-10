@@ -133,6 +133,11 @@ end
 
 local function remove_app(app_info)
 	local app_id = app_info.id or app_info.name:gsub("%W+", "-"):lower();
+	for i = #site_apps, 1, -1 do
+		if site_apps[i].id == app_id then
+			table.remove(site_apps, i);
+		end
+	end
 	site_apps[app_id] = nil;
 end
 
