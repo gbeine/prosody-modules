@@ -63,6 +63,7 @@ end
 local http_files = module:depends("http_files");
 
 module:provides("http", {
+	default_path = "/";
 	route = {
 		["GET"] = serve_page;
 		["GET /*"] = http_files.serve({ path = template_path });
