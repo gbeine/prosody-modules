@@ -26,6 +26,7 @@ local add_filter = require "util.filters".add_filter;
 local timer = require "util.timer";
 local datetime = require "util.datetime";
 
+local xmlns_mam2 = "urn:xmpp:mam:2";
 local xmlns_sm2 = "urn:xmpp:sm:2";
 local xmlns_sm3 = "urn:xmpp:sm:3";
 local xmlns_errors = "urn:ietf:params:xml:ns:xmpp-stanzas";
@@ -438,11 +439,16 @@ module:hook("delivery/failure", function(event)
 	if session.username then
 		if stanza.name == "message" and stanza.attr.xmlns == nil and
 				( stanza.attr.type == "chat" or ( stanza.attr.type or "normal" ) == "normal" ) then
+			-- don't store messages in offline store if they are mam results
+			local mam_result = stanza:get_child("result", xmlns_mam2);
+			if mam_result ~= nil then
+				return true;		-- stanza already "handled", don't send an error and don't add it to offline storage
+			end
 			-- do nothing here for normal messages and don't send out "message delivery errors",
 			-- because messages are already in MAM at this point (no need to frighten users)
 			local stanza_id = get_stanza_id(stanza, jid.bare(session.full_jid));
 			if session.mam_requested and stanza_id ~= nil then
-				session.log("debug", "mod_smacks delivery/failuere returning true for mam-handled stanza: mam-archive-id=%s", tostring(stanza_id));
+				session.log("debug", "mod_smacks delivery/failure returning true for mam-handled stanza: mam-archive-id=%s", tostring(stanza_id));
 				return true;		-- stanza handled, don't send an error
 			end
 			-- store message in offline store, if this client does not use mam *and* was the last client online
@@ -451,7 +457,7 @@ module:hook("delivery/failure", function(event)
 			if sessions and next(sessions) == session.resource and next(sessions, session.resource) == nil then
 				local ok = module:fire_event("message/offline/handle", { origin = session, stanza = stanza } );
 				session.log("debug", "mod_smacks delivery/failuere returning %s for offline-handled stanza", tostring(ok));
-				return ok;		-- if stanza was handled, don't send an error
+				return ok;			-- if stanza was handled, don't send an error
 			end
 		end
 	end
