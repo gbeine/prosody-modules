@@ -136,6 +136,7 @@ function module.add_host(module)
 
 	-- Setup HTTP server
 	module:provides("http", {
+		title = "Admin Interface";
 		name = "admin";
 		route = {
 			["GET"] = function(event)
