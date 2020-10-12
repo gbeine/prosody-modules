@@ -11,7 +11,6 @@ local get_room_from_jid = rawget(mod_muc, "get_room_from_jid") or
 
 module:log("debug", "Module loaded");
 
-
 local function respondToBatchedProbe(event)
 	local stanza = event.stanza;
 	if stanza.attr.type ~= "get" then
@@ -38,11 +37,10 @@ local function respondToBatchedProbe(event)
 			if pr then
 				room:route_stanza(pr);
 			end
-			return;
+		else
+			local x = st.stanza("x", {xmlns = "http://jabber.org/protocol/muc#user"});
+			room:publicise_occupant_status(probed_occupant, x, nil, nil, nil, nil, false, probing_occupant);
 		end
-		local x = st.stanza("x", {xmlns = "http://jabber.org/protocol/muc#user"});
-		room:publicise_occupant_status(probed_occupant, x, nil, nil, nil, nil, false, probing_occupant);
-
 	end
 	origin.send(st.reply(stanza));
 	return true;
