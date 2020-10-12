@@ -22,12 +22,29 @@ local function respondToBatchedProbe(event)
 		return;
 	end;
 
+	local origin = event.origin;
 	local room = get_room_from_jid(stanza.attr.to);
+	local probing_occupant = room:get_occupant_by_real_jid(stanza.attr.from);
+	if probing_occupant == nil then
+		origin.send(st.error_reply(stanza, "cancel", "not-acceptable", "You are not currently connected to this chat", room.jid));
+		return true;
+	end
+
 	for item in query:children() do
 		local probed_jid = item.attr.jid;
-		room:respond_to_probe(stanza.attr.from, probed_jid);
+		local probed_occupant = room:get_occupant_by_nick(probed_jid);
+		if probed_occupant == nil then
+			local pr = room:build_unavailable_presence(probed_jid, stanza.attr.from);
+			if pr then
+				room:route_stanza(pr);
+			end
+			return;
+		end
+		local x = st.stanza("x", {xmlns = "http://jabber.org/protocol/muc#user"});
+		room:publicise_occupant_status(probed_occupant, x, nil, nil, nil, nil, false, probing_occupant);
+
 	end
-	event.origin.send(st.reply(stanza));
+	origin.send(st.reply(stanza));
 	return true;
 end
 
