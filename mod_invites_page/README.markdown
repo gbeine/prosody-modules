@@ -48,7 +48,7 @@ Configuration
 |---------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------|
 | invites_page              | The format of an invite page URL (must begin with `https://`)                  | `"https://{host}:5281/invites_page?{invite.token}"`        |
 | invites_registration_page | The format of an invite registration page URL (may be relative to invites_page)| `"register?t={invite.token}&c={app.id}"`                   |
-|                           |                                                                                | site_name                 | The friendly name of the server| `"example.com"` |
+| site_name                 | The friendly name of the server                                                | `"example.com"`                                            |
 
 The `invites_page` and `invites_registration_page` options are templates
 that support a number of variables. The most useful being `{host}` and
