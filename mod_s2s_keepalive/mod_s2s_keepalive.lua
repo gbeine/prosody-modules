@@ -1,5 +1,6 @@
 local st = require "util.stanza";
 local watchdog = require "util.watchdog";
+local dt = require "util.datetime";
 
 local keepalive_servers = module:get_option_set("keepalive_servers");
 local keepalive_interval = module:get_option_number("keepalive_interval", 60);
@@ -14,7 +15,7 @@ local function send_pings()
 	for remote_domain, session in pairs(s2sout) do
 		if session.type ~= "s2sout_unauthed"
 		and (not(keepalive_servers) or keepalive_servers:contains(remote_domain)) then
-			session.sends2s(st.iq({ to = remote_domain, type = "get", from = host, id = "keepalive" })
+			session.sends2s(st.iq({ to = remote_domain, type = "get", from = host, id = "keepalive:"..dt.timestamp()})
 				:tag("ping", { xmlns = "urn:xmpp:ping" })
 			);
 		end
@@ -32,7 +33,7 @@ local function send_pings()
 
 	-- ping remotes we only have s2sin from
 	for remote_domain in pairs(ping_hosts) do
-		module:send(st.iq({ to = remote_domain, type = "get", from = host, id = "keepalive" })
+		module:send(st.iq({ to = remote_domain, type = "get", from = host, id = "keepalive:"..dt.timestamp() })
 			:tag("ping", { xmlns = "urn:xmpp:ping" })
 		);
 	end
@@ -60,7 +61,12 @@ module:hook("s2sout-established", function (event)
 	end);
 end);
 
-module:hook("iq-result/host/keepalive", function (event)
+module:hook("iq-result/host", function (event)
+	local stanza = event.stanza;
+	if not (stanza.attr.id and stanza.attr.id:sub(1, #"keepalive:") == "keepalive:") then
+		return -- not a reply to this module
+	end
+
 	local origin = event.origin;
 	if origin.watchdog_keepalive then
 		origin.watchdog_keepalive:reset();
@@ -71,14 +77,19 @@ module:hook("iq-result/host/keepalive", function (event)
 	return true;
 end);
 
-module:hook("iq-error/host/keepalive", function (event)
+module:hook("iq-error/host", function (event)
 	local origin = event.origin;
 	if origin.dummy then return end -- Probably a sendq bounce
+
+	local stanza = event.stanza;
+	if not (stanza.attr.id and stanza.attr.id:sub(1, #"keepalive:") == "keepalive:") then
+		return -- not a reply to this module
+	end
 
 	if origin.type == "s2sin" or origin.type == "s2sout" then
 		-- An error from the remote means connectivity is ok,
 		-- so treat it the same as a result
-		return module:fire_event("iq-result/host/keepalive", event);
+		return module:fire_event("iq-result/host", event);
 	end
 end);
 
