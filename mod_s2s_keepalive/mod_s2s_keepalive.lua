@@ -15,7 +15,7 @@ local function send_pings()
 	for remote_domain, session in pairs(s2sout) do
 		if session.type ~= "s2sout_unauthed"
 		and (not(keepalive_servers) or keepalive_servers:contains(remote_domain)) then
-			session.sends2s(st.iq({ to = remote_domain, type = "get", from = host, id = "keepalive:"..dt.timestamp()})
+			session.sends2s(st.iq({ to = remote_domain, type = "get", from = host, id = "keepalive:"..dt.datetime()})
 				:tag("ping", { xmlns = "urn:xmpp:ping" })
 			);
 		end
@@ -33,7 +33,7 @@ local function send_pings()
 
 	-- ping remotes we only have s2sin from
 	for remote_domain in pairs(ping_hosts) do
-		module:send(st.iq({ to = remote_domain, type = "get", from = host, id = "keepalive:"..dt.timestamp() })
+		module:send(st.iq({ to = remote_domain, type = "get", from = host, id = "keepalive:"..dt.datetime() })
 			:tag("ping", { xmlns = "urn:xmpp:ping" })
 		);
 	end
