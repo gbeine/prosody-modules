@@ -92,9 +92,16 @@ Note that the following options are automatically provided, and
 **overriding them may cause problems**:
 
 -   `authentication` *based on Prosody's authentication settings*
--   `jid` *the current `VirtualHost`*
 -   `bosh_service_url`
 -   `websocket_url`
+-   `discover_connection_methods` *Disabled since we provide this*
+-   `assets_path`
+-   `allow_registration` *based on whether registration is enabled*
+-   These settings are set to the current `VirtualHost`:
+    -   `jid`
+    -   `default_domain`
+    -   `domain_placeholder`
+    -   `registration_domain`
 
 `mod_bosh` and/or `mod_websocket` are automatically enabled if available
 and the respective endpoint is included in the generated options.
