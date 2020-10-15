@@ -84,19 +84,29 @@ local user_options = module:get_option("conversejs_options");
 local function get_converse_options()
 	local allow_registration = module:get_option_boolean("allow_registration", false);
 	local converse_options = {
+		-- Auto-detected connection endpoints
 		bosh_service_url = has_bosh and module:http_url("bosh","/http-bind") or nil;
 		websocket_url = has_ws and module:http_url("websocket","xmpp-websocket"):gsub("^http", "ws") or nil;
-		authentication = module:get_option_string("authentication") == "anonymous" and "anonymous" or "login";
+		-- Since we provide those, XEP-0156 based auto-discovery should not be used
 		discover_connection_methods = false;
+		-- Authentication mode to use (normal or guest login)
+		authentication = module:get_option_string("authentication") == "anonymous" and "anonymous" or "login";
+		-- Host to connect to for anonymous access
 		jid = module.host;
+		-- Let users login with only username
 		default_domain = module.host;
 		domain_placeholder = module.host;
+		-- If registration is enabled
 		allow_registration = allow_registration;
+		-- and if it is, which domain to register with
 		registration_domain = allow_registration and module.host or nil;
+		-- Path to resources like emoji, icons, sounds
 		assets_path = cdn_url..version.."/dist/";
+		-- Default most suited for use as a "normal" client
 		view_mode = "fullscreen";
 	};
 
+	-- Let config override the above defaults
 	if type(user_options) == "table" then
 		for k,v in pairs(user_options) do
 			converse_options[k] = v;
