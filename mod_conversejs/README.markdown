@@ -47,6 +47,10 @@ mod_conversejs also determines the [BOSH][doc:setting_up_bosh] and
 documentation for how to configure them. Both connection methods are
 loaded automatically.
 
+Auto-loading of `mod_bosh` or `mod_websocket` can be prevented by adding
+it to `modules_disabled` but note that at least one of them must be
+allowed for Converse.js to work.
+
 HTTP
 ----
 
