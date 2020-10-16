@@ -51,8 +51,11 @@ The possible fields of the logging config entry are:
     old data will be overwritten by new data.
 
 `filename`
-:   The name of the file to dump logs to when triggered. The filename may
-    contain a number of variables, described below. Defaults to
+:   The name of the file to dump logs to when triggered.
+
+`filename_template`
+:   This parameter may optionally be specified instead of `filename. It
+    may contain a number of variables, described below. Defaults to
     `"{paths.data}/ringbuffer-logs-{pid}-{count}.log"`.
 
 Only one of the following triggers may be specified:
@@ -67,6 +70,9 @@ Only one of the following triggers may be specified:
     the logs to be dumped, e.g. `"config-reloaded"`.
 
 ## Filename variables
+
+If `filename_template` is specified instead of `filename`, it may contain
+any of the following variables in curly braces, e.g. `{pid}`.
 
 `pid`
 :   The PID of the current process

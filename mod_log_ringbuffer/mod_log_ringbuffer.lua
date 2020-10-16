@@ -68,7 +68,7 @@ local function ringbuffer_log_sink_maker(sink_config)
 	end
 
 	local function dump()
-		dump_buffer(buffer, get_filename(sink_config.filename));
+		dump_buffer(buffer, sink_config.filename or get_filename(sink_config.filename_template));
 	end
 
 	if sink_config.signal then
