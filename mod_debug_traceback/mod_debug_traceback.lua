@@ -40,7 +40,7 @@ function dump_traceback()
 		return;
 	end
 	f:write("-- Traceback generated at ", os.date("%b %d %H:%M:%S"), " --\n");
-	f:write(traceback(), "\n");
+	f:write(tb, "\n");
 	f:write("-- End of traceback --\n");
 	f:close();
 	count = count + 1;
