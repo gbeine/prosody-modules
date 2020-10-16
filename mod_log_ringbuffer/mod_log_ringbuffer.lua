@@ -10,7 +10,7 @@ local max_chunk_size = module:get_option_number("log_ringbuffer_chunk_size", 163
 
 local os_date = os.date;
 
-local default_filename_template = "ringbuffer-logs-{pid}-{count}.log";
+local default_filename_template = "{paths.data}/ringbuffer-logs-{pid}-{count}.log";
 local render_filename = require "util.interpolation".new("%b{}", function (s) return s; end, {
 	yyyymmdd = function (t)
 		return os_date("%Y%m%d", t);

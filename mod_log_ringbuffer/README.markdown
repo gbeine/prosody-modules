@@ -52,7 +52,8 @@ The possible fields of the logging config entry are:
 
 `filename`
 :   The name of the file to dump logs to when triggered. The filename may
-    contain a number of variables, described below.
+    contain a number of variables, described below. Defaults to
+    `"{paths.data}/ringbuffer-logs-{pid}-{count}.log"`.
 
 Only one of the following triggers may be specified:
 
