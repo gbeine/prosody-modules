@@ -61,14 +61,19 @@ module:hook("s2sout-established", function (event)
 	end);
 end);
 
-module:hook("iq-result/host", function (event)
+module:hook("iq/host", function (event)
 	local stanza = event.stanza;
+	if stanza.attr.type ~= "result" and stanza.attr.type == "error" then
+		return -- not a reply iq stanza
+	end
 	if not (stanza.attr.id and stanza.attr.id:sub(1, #"keepalive:") == "keepalive:") then
 		return -- not a reply to this module
 	end
 
 	local origin = event.origin;
+	if origin.dummy then return end -- Probably a sendq bounce
 	if origin.watchdog_keepalive then
+		origin.log("debug", "Resetting keepalive watchdog")
 		origin.watchdog_keepalive:reset();
 	end
 	if s2sout[origin.from_host] and s2sout[origin.from_host].watchdog_keepalive then
@@ -76,21 +81,3 @@ module:hook("iq-result/host", function (event)
 	end
 	return true;
 end);
-
-module:hook("iq-error/host", function (event)
-	local origin = event.origin;
-	if origin.dummy then return end -- Probably a sendq bounce
-
-	local stanza = event.stanza;
-	if not (stanza.attr.id and stanza.attr.id:sub(1, #"keepalive:") == "keepalive:") then
-		return -- not a reply to this module
-	end
-
-	if origin.type == "s2sin" or origin.type == "s2sout" then
-		-- An error from the remote means connectivity is ok,
-		-- so treat it the same as a result
-		return module:fire_event("iq-result/host", event);
-	end
-end);
-
-module:add_timer(keepalive_interval, send_pings);
