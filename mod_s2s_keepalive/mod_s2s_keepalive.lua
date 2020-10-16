@@ -81,3 +81,5 @@ module:hook("iq/host", function (event)
 	end
 	return true;
 end);
+
+module:add_timer(keepalive_interval, send_pings);
