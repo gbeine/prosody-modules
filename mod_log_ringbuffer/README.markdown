@@ -92,6 +92,29 @@ any of the following variables in curly braces, e.g. `{pid}`.
 The filename does not have to be unique for every dump - if a file with the same
 name already exists, it will be appended to.
 
+## Integration with mod_debug_traceback
+
+This module can be used in combination with [mod_debug_traceback] so that debug
+logs are dumped at the same time as the traceback. Use the following configuration:
+
+``` {.lua}
+log = {
+	---
+	-- other optional logging config here --
+	---
+
+	{
+		to = "ringbuffer";
+		level = "debug";
+		filename_template = "{paths.data}/traceback-{pid}-{count}.log";
+		event = "debug_traceback/triggered";
+	};
+}
+```
+
+If the filename template matches the traceback path, both logs and traceback will
+be combined into the same file. Of course separate files can be specified if preferred.
+
 # Compatibility
 
 0.11 and later.
