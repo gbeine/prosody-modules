@@ -54,6 +54,10 @@ function handle_request(event)
 		return 403;
 	end
 
+	if api_user.allowed_methods and not api_user.allowed_methods[event.request.method] then
+		return 405;
+	end
+
 	local invite = invites.create_account(nil, { source = "api/token/"..api_user.id });
 	if not invite then
 		return 500;
@@ -104,6 +108,7 @@ function module.command(arg)
 			token = token;
 			name = arg[1];
 			created_at = os.time();
+			allowed_methods = { GET = true, POST = true };
 		});
 		print(id.."/"..token);
 	elseif command == "delete" then
