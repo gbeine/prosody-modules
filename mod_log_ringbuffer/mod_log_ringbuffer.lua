@@ -74,7 +74,7 @@ local function ringbuffer_log_sink_maker(sink_config)
 	if sink_config.signal then
 		require "util.signal".signal(sink_config.signal, dump);
 	elseif sink_config.event then
-		module:hook_global(sink_config.global_event, dump);
+		module:hook_global(sink_config.event, dump);
 	end
 
 	return function (name, level, message, ...)
