@@ -342,7 +342,7 @@ local function handle_notify_request(stanza, node, user_push_services, log_push_
 				push_publish:tag("publish-options"):add_child(st.deserialize(push_info.options));
 			end
 			-- send out push
-			module:log("debug", "Sending%s push notification for %s@%s to %s (%s)", form_data["last-message-body"] and " important" or "", node, module.host, push_info.jid, tostring(push_info.node));
+			module:log("debug", "Sending %s push notification for %s@%s to %s (%s)", form_data["last-message-body"] and "important" or "unimportant", node, module.host, push_info.jid, tostring(push_info.node));
 			-- module:log("debug", "PUSH STANZA: %s", tostring(push_publish));
 			-- handle push errors for this node
 			if push_errors[push_identifier] == nil then
