@@ -17,6 +17,7 @@ account registration for Prosody. The other modules are:
 - [mod_invites_page]
 - [mod_invites_register]
 - [mod_invites_register_web]
+- [mod_invites_api]
 - [mod_register_apps]
 
 For details and a full overview, start with the [mod_invites] documentation.
