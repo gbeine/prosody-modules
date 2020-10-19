@@ -47,7 +47,7 @@ function dump_traceback()
 end
 
 local mod_posix = module:depends("posix");
-if mod_posix.features and mod_posix.features.signal_events then
+if rawget(mod_posix, "features") and mod_posix.features.signal_events then
 	module:hook("signal/"..signal_name, dump_traceback);
 else
 	require"util.signal".signal(signal_name, dump_traceback);
