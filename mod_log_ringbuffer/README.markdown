@@ -50,6 +50,10 @@ The possible fields of the logging config entry are:
 :   The size, in bytes, of the buffer. When the buffer fills,
     old data will be overwritten by new data.
 
+`lines`
+:   If specified, preserves the latest N complete lines in the
+    buffer. The `size` option is ignored when this option is set.
+
 `filename`
 :   The name of the file to dump logs to when triggered.
 
