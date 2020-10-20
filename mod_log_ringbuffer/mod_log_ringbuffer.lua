@@ -57,7 +57,8 @@ local function get_filename(filename_template)
 end
 
 local function ringbuffer_log_sink_maker(sink_config)
-	local buffer = rb.new(sink_config.size or 100*1024);
+	local buffer_size = sink_config.size or 100*1024;
+	local buffer = rb.new(buffer_size);
 
 	local timestamps = sink_config.timestamps;
 
@@ -78,7 +79,16 @@ local function ringbuffer_log_sink_maker(sink_config)
 	end
 
 	return function (name, level, message, ...)
-		buffer:write(format("%s%s\t%s\t%s\n", timestamps and os_date(timestamps) or "", name, level, format(message, ...)));
+		local line = format("%s%s\t%s\t%s\n", timestamps and os_date(timestamps) or "", name, level, format(message, ...));
+		if not buffer:write(line) then
+			if #line > buffer_size then
+				buffer:discard(buffer_size);
+				buffer:write(line:sub(-buffer_size));
+			else
+				buffer:discard(#line);
+				buffer:write(line);
+			end
+		end
 	end;
 end
 
