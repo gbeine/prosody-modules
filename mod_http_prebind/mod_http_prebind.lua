@@ -132,7 +132,7 @@ end;
 module:provides("http", {
 	route = {
 		["GET"] = function (event)
-			return connect_to_bosh("http://[::1]:5280/http-bind", "anon.localhost")
+			return connect_to_bosh("http://[::1]:5280/http-bind", module.host)
 				:next(authenticate)
 				:next(restart_stream)
 				:next(bind);
