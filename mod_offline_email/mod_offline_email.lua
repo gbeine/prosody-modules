@@ -32,6 +32,7 @@ function send_message_as_email(address, from_address, message_text, subject)
 
 	local mesgt = {
 		headers = {
+			["content-type"] = 'text/plain; charset=utf-8';
 			to = address;
 			subject = subject or ("Offline message from "..jid_bare(from_address));
 		};
