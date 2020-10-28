@@ -1,5 +1,8 @@
 ---
 summary: Cache Bits of Binary on MUC services
+rockspec:
+  dependencies:
+    - mod_cache_c2s_caps
 ---
 
 Description
