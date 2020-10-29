@@ -16,6 +16,7 @@ local ldap_tls = module:get_option_boolean("ldap_tls");
 local ldap_scope = module:get_option_string("ldap_scope", "subtree");
 local ldap_filter = module:get_option_string("ldap_filter", "(uid=$user)"):gsub("%%s", "$user", 1);
 local ldap_base = assert(module:get_option_string("ldap_base"), "ldap_base is a required option for ldap");
+local ldap_deref = module:get_option_string("ldap_deref", "always");
 local ldap_mode = module:get_option_string("ldap_mode", "bind");
 local ldap_admins = module:get_option_string("ldap_admin_filter",
 	module:get_option_string("ldap_admins")); -- COMPAT with mistake in documentation
@@ -44,6 +45,12 @@ end
 
 function ldap_do(method, retry_count, ...)
 	local dn, attr, where;
+	local function contains(table, x)
+		for _, v in pairs(table) do
+			if v == x then return true end
+		end
+		return false
+	end
 	for _=1,1+retry_count do
 		dn, attr, where = ldap_do_once(method, ...);
 		if dn or not(attr) then break; end -- nothing or something found
@@ -53,6 +60,11 @@ function ldap_do(method, retry_count, ...)
 	if not dn and attr then
 		module:log("error", "LDAP: %s", tostring(attr));
 	end
+	if ldap_deref == "always" and contains(attr["objectClass"], "alias") and attr["aliasedObjectName"] ~= nil then
+		module:log("debug", "LDAP dn: %s", attr["aliasedObjectName"]);
+		dn = attr["aliasedObjectName"]
+	end
+	module:log("debug", "LDAP dn: %s", tostring(dn));
 	return dn, attr;
 end
 

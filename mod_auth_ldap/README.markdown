@@ -37,7 +37,8 @@ Further LDAP options are:
   ldap\_rootdn          The distinguished name to auth against                                                                                 `""` (anonymous)
   ldap\_password        Password for rootdn                                                                                                    `""`
   ldap\_filter          Search filter, with `$user` and `$host` substituted for user- and hostname                                             `"(uid=$user)"`
-  ldap\_scope           Search scope. other values: "base" and "onelevel"                                                                      `"subtree"`
+  ldap\_scope           Search scope. Other values: "base" and "onelevel"                                                                      `"subtree"`
+  ldap\_deref           Derefence aliased object. Values: "never", "always"                                                                    `"always"`
   ldap\_tls             Enable TLS (StartTLS) to connect to LDAP (can be true or false). The non-standard 'LDAPS' protocol is not supported.   `false`
   ldap\_mode            How passwords are validated.                                                                                           `"bind"`
   ldap\_admin\_filter   Search filter to match admins, works like ldap\_filter
